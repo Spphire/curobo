@@ -13,7 +13,10 @@ from curobo.wrap.reacher.ik_solver import IKSolver, IKSolverConfig
 import time
 import numpy as np
 
-def get_custom_world_model(table_height=0.02, y_offset=0.54+0.313, up_height=1.35):
+# 自定义双臂碰撞体环境
+def get_custom_world_model(table_height=0.02, 
+                           y_offset=0.313+0.54, #双臂中心到南北向边界距离
+                           up_height=1.35):
     table = Cuboid(
         name="table",
         dims=[4.0,4.0,4.0],
@@ -47,8 +50,9 @@ class BiFlexivController():
     def __init__(self, local_ip="192.168.2.223", 
                  left_robot_ip="192.168.2.100", 
                  right_robot_ip="192.168.2.101",
-                 left_origin_offset=[0,0.313,0],
-                 right_origin_offset=[0,-0.313,0]) -> None:
+                 left_origin_offset=[0,0.313,0], # 实验室双臂间距为0.626m，南北向y轴
+                 right_origin_offset=[0,-0.313,0]
+                 ) -> None:
         
 
         self.left_robot = FlexivController(world_model=get_custom_world_model(),
@@ -61,7 +65,7 @@ class BiFlexivController():
                                       robot_ip=right_robot_ip,
                                       origin_offset=right_origin_offset)
         self.right_robot.init_mpc()
-        self.joint_names = [f"joint{i}" for i in range(1,8)]+[f"joint{i}_1" for i in range(1,8)]
+        self.joint_names = [f"joint{i}" for i in range(1,8)]+[f"joint{i}_1" for i in range(1,8)] # config中joints的命名
         print("current q: ", self.left_robot.get_current_q()+self.right_robot.get_current_q())
 
         self.tensor_args = TensorDeviceType()
@@ -96,7 +100,7 @@ class BiFlexivController():
             step_dt=0.02,
         )
         self.mpc_init()
-        #print(self.mpc.rollout_fn.dynamics_model.retract_config.shape)
+
         self.left_robot.init_retract(self.mpc.rollout_fn.dynamics_model.retract_config[:7].unsqueeze(0))
         self.right_robot.init_retract(self.mpc.rollout_fn.dynamics_model.retract_config[7:].unsqueeze(0))
 
@@ -142,7 +146,6 @@ class BiFlexivController():
         self.right_robot.homing_state=True
 
         cu_js = self.get_current_jointstate()
-        #print(cu_js)
         result = self.motion_gen.plan_single(cu_js.unsqueeze(0),
                                              goal_pose=self.left_robot.retract_pose,
                                             #  Pose(
@@ -210,7 +213,6 @@ class BiFlexivController():
 
     def get_current_jointstate(self):
         q = self.left_robot.get_current_q() + self.right_robot.get_current_q()
-        #print(q)
         return JointState(
             position=self.tensor_args.to_device(q),
             velocity=self.tensor_args.to_device(q) * 0.0,

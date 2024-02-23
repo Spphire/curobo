@@ -55,7 +55,11 @@ class VirtualFlexivController():
                                  quaternion=state.ee_quat_seq)
 
 class FlexivController():
-    def __init__(self,world_model:WorldConfig,local_ip="192.168.2.223",robot_ip="192.168.2.100",origin_offset=[0,0.313,0]) -> None:
+    def __init__(self,world_model:WorldConfig,
+                 local_ip="192.168.2.223",
+                 robot_ip="192.168.2.100",
+                 origin_offset=[0,0.313,0] # 实验室双臂间距为0.626m，南北向y轴
+                 ) -> None:
         self.homing_state=False
         self.tracking_state=False
         self.locked=False
@@ -219,7 +223,7 @@ class FlexivController():
                 quaternion=self.tensor_args.to_device(target[3:]),
             )
             result = self.motion_gen.plan_single(cu_js.unsqueeze(0), ik_goal, self.plan_config)
-            succ = result.success.item()  # ik_result.success.item()
+            succ = result.success.item()
             if succ:
                 with self.lock :
                     self.cmd_plan = result.get_interpolated_plan()
@@ -231,6 +235,9 @@ class FlexivController():
         self.past_pose = target[:3]
 
     def init_retract(self,tensor):
+        # 重新设置retract tcp
+        # 从单臂config中获取的信息要补偿上双臂config中两臂间距
+        # 单臂config原点是机械臂底部，双臂config原点是两臂底部的中心
         self.retract_cfg = tensor 
         if hasattr(self, 'single_mpc'):
             self.retract_state = JointState.from_position(self.tensor_args.to_device(self.retract_cfg), 
@@ -249,14 +256,17 @@ class FlexivController():
                                  quaternion=self.tensor_args.to_device(new_quat))
 
     def get_current_q(self) -> List[float]:
+        # 返回flexivAPI下机械臂当前joints值
         self.robot.getRobotStates(self.robot_states)
         return self.robot_states.q
     
     def get_current_jointstate(self):
+        # 返回Curobo JointState类包装下的joints值
         q = self.get_current_q()
         return JointState.from_position(self.tensor_args.to_device(q), joint_names=self.single_joint_names)
 
     def get_current_tcp(self) -> np.ndarray:
+        # 返回机械臂当前末端位姿
         if hasattr(self, 'single_mpc'):
             state = self.single_mpc.rollout_fn.compute_kinematics(
                 self.get_current_jointstate()
@@ -275,6 +285,7 @@ class FlexivController():
         
     
     def get_current_Pose(self):
+        # 返回Curobo Pose类包装下的tcp
         temp = self.get_current_tcp()
         return Pose(
             position=self.tensor_args.to_device(temp[:3]),
@@ -285,8 +296,8 @@ class FlexivController():
         return (not self.locked) and (self.homing_state or self.tracking_state)
 
     def move(self, target_q):
-        v = [1.5]*self.DOF
-        a = [0.8]*self.DOF
+        v = [1.5]*self.DOF #速度限制
+        a = [0.8]*self.DOF #加速度限制
         if self.can_move():
             self.robot.sendJointPosition(
                     target_q, 
@@ -296,12 +307,14 @@ class FlexivController():
                     a)
     
     def set_start_tcp(self, pos_quat:np.ndarray):
+        # 记录unity下起始位置以及真实起始位置
         self.start_real_tcp = self.get_current_tcp()
         self.start_unity_tcp = pos_quat
         self.tracking_state=True
 
     def get_relative_target(self, pos_from_unity):
-
+        # unity中相对于记录的unity下起始位置的位移量
+        # 加到记录的真实起始位置
         target=np.zeros(7)
         target[:3]=pos_from_unity[:3] - self.start_unity_tcp[:3] + self.start_real_tcp[:3]
         target_rot_mat = t3d.quaternions.quat2mat(pos_from_unity[3:]) \

@@ -7,7 +7,8 @@ from bi_flexiv_controller import BiFlexivController
 import numpy as np  
 import transforms3d as t3d
 
-def unity2zup_right_frame(pos_quat):
+# unity左手坐标系z东y上转右手坐标系x东z上
+def unity2zup_right_frame(pos_quat: np.ndarray):
         pos_quat*=np.array([1,-1,1,1,-1,1,-1])
         rot_mat = t3d.quaternions.quat2mat(pos_quat[3:])
         pos_vec = pos_quat[:3]
@@ -22,10 +23,12 @@ def unity2zup_right_frame(pos_quat):
         return target
 
 class Receiver(Thread):
-    def __init__(self, controller:BiFlexivController, local_ip= "192.168.2.223",port=8082):
+    def __init__(self, 
+                 controller:BiFlexivController, 
+                 local_ip= "192.168.2.223", # 机械臂那台机子ip
+                 port=8082):
         self.address = (local_ip, port)
         self.socket_obj = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        #self.socket_obj.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket_obj.setblocking(0)
         self.controller = controller
         self.isOn=True
@@ -41,13 +44,15 @@ class Receiver(Thread):
         try:
             data, _ = self.socket_obj.recvfrom(1024)
             s=json.loads(data)
-            #print(s)
 
             if self.controller.left_robot.homing_state or self.controller.right_robot.homing_state:
                 return True
 
+            # 夹爪部分
             self.controller.left_robot.gripper.move(s["leftHand"]["squeeze"], 10, 20)
-            self.controller.right_robot.gripper.move(s["rightHand"]["squeeze"], 10, 20)
+            self.controller.right_robot.gripper.move(s["rightHand"]["squeeze"], 
+                                                     10, # API中显示似乎是速度但修改没有效果
+                                                     20)
 
             if s["leftHand"]["cmd"]==3 or s["rightHand"]["cmd"]==3:
                 self.controller.birobot_go_home()
@@ -83,8 +88,10 @@ class Receiver(Thread):
 
 
             if not self.controller.left_robot.homing_state and not self.controller.right_robot.homing_state:
+                # 手移动过快或是定位抽搐自动断开跟随状态
+                threshold = 0.5
                 left_target = self.controller.left_robot.get_relative_target(l_pos_from_unity)
-                if np.linalg.norm(left_target[:3]-self.controller.left_robot.get_current_tcp()[:3])>0.5:
+                if np.linalg.norm(left_target[:3]-self.controller.left_robot.get_current_tcp()[:3])>threshold:
                     if self.controller.left_robot.tracking_state:
                         print("left robot lost sync")
                     self.controller.left_robot.tracking_state=False
@@ -92,7 +99,7 @@ class Receiver(Thread):
                     left_target =self.controller.left_robot.get_current_tcp()
 
                 right_target = self.controller.right_robot.get_relative_target(r_pos_from_unity)
-                if np.linalg.norm(right_target[:3]-self.controller.right_robot.get_current_tcp()[:3])>0.5:
+                if np.linalg.norm(right_target[:3]-self.controller.right_robot.get_current_tcp()[:3])>threshold:
                     if self.controller.right_robot.tracking_state:
                         print("right robot lost sync")
                     self.controller.right_robot.tracking_state=False
