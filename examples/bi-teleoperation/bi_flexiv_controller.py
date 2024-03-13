@@ -201,8 +201,8 @@ class BiFlexivController():
 
             self.goal_buffer.goal_pose.copy_(ik_goal)
             self.mpc.update_goal(self.goal_buffer)
-            self.past_pose = target_position_l
-            self.past_rot = target_orientation_l
+            self.past_pose_l = target_position_l
+            self.past_rot_l = target_orientation_l
             self.past_pose_r = target_position_r
             self.past_rot_r = target_orientation_r
 
