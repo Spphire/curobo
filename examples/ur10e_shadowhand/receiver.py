@@ -22,7 +22,7 @@ def unity2zup_right_frame(pos_quat):
         return target
 
 class Receiver(Thread):
-    def __init__(self, controller:Ur10eController, local_ip= "10.53.21.88",port=8082):
+    def __init__(self, controller:Ur10eController, local_ip= "10.53.21.90",port=8082):
         self.address = (local_ip, port)
         self.socket_obj = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         #self.socket_obj.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -41,7 +41,6 @@ class Receiver(Thread):
         try:
             data, _ = self.socket_obj.recvfrom(1024)
             s=json.loads(data)
-            #print(s)
 
             if self.controller.homing_state:
                 return True
@@ -70,12 +69,15 @@ class Receiver(Thread):
 
             if not self.controller.homing_state:
                 target = self.controller.get_relative_target(pos_from_unity)
-                if np.linalg.norm(target[:3]-self.controller.get_current_tcp()[:3])>0.5:
+                dis = np.linalg.norm(target[:3]-self.controller.get_current_tcp()[:3])
+                #print(dis)
+                if dis>0.1:
                     if self.controller.tracking_state:
                         print("robot lost sync")
                     self.controller.tracking_state=False
                 if not self.controller.tracking_state:
                     target =self.controller.get_current_tcp()
+                    #print(target)
 
 
                 self.controller.mpc_excute(target)
@@ -83,8 +85,21 @@ class Receiver(Thread):
         except:
             #print("error in udp")
             return False
-        
+
+
+from curobo.geom.types import WorldConfig, Cuboid
+def get_custom_world_model(table_height=0.02):
+    table = Cuboid(
+        name="table",
+        dims=[4.0,4.0,4.0],
+        pose=[0.0, 0.0, -2.0+table_height, 1.0, 0, 0, 0],
+        color=[0, 1.0, 0, 1.0],
+    )
+    return WorldConfig(
+        cuboid=[table],
+    )
+
 if __name__ == "__main__":
-    uc = Ur10eController()
+    uc = Ur10eController(get_custom_world_model())
     r = Receiver(controller=uc)
     r.run()
