@@ -78,7 +78,8 @@ class Receiver(Thread):
                 if not self.controller.tracking_state:
                     target =self.controller.get_current_tcp()
                     #print(target)
-
+                else:
+                    self.controller.move_hand(s["q"])
 
                 self.controller.mpc_excute(target)
             return True
