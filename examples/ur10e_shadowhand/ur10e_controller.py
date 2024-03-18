@@ -16,6 +16,7 @@ from curobo.geom.types import WorldConfig
 from curobo.types.math import Pose
 from curobo.rollout.rollout_base import Goal
 
+import logging
 
 def get_custom_world_model(table_height=0.02):
     table = Cuboid(
@@ -160,7 +161,11 @@ class Ur10eController():
 
     def move(self, target_q: List[float]):
         if self.can_move():
-            requests.post("http://"+self.ros_ip+":"+self.ros_port+"/move",json.dumps({'q': target_q}))
+            requests.post("http://"+self.ros_ip+":"+self.ros_port+"/move",json.dumps({'q': target_q}), timeout=0.05)
+    
+    def move_hand(self, target_q: List[float]):
+        if self.can_move():
+            requests.post("http://"+self.ros_ip+":"+self.ros_port+"/move_hand",json.dumps({'q': target_q}), timeout=0.05)
 
     def set_start_tcp(self, pos_quat:np.ndarray):
         self.start_real_tcp = self.get_current_tcp()
