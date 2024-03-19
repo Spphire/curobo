@@ -47,18 +47,9 @@ class Ur10eController():
 
         self.DOF=6
 
-        try:
-            q = requests.post("http://"+self.ros_ip+":"+self.ros_port+"/getJoints")
-            if len(list(json.loads(q.content).values()))==self.DOF:
-                print("connected to ros!")
-                self.init_mpc()
-            else:
-                print("DOF wrong")
-                
-        except:
-            print("Failed to connect to ros!")
-            quit()
-
+        self.get_q_from_ros()
+        print("connected to ros!")
+        self.init_mpc()
         
 
     def init_mpc(self,config_name="ur10e.yml"):
@@ -120,15 +111,21 @@ class Ur10eController():
 
         self.retract_pose = Pose(position=self.tensor_args.to_device(new_pos), 
                                  quaternion=self.tensor_args.to_device(new_quat))
-        
-    def get_current_q(self) -> List[float]:
+    
+    def get_q_from_ros(self):
         try:
             q = requests.post("http://"+self.ros_ip+":"+self.ros_port+"/getJoints")
             if len(list(json.loads(q.content).values()))==self.DOF:
-                return list(json.loads(q.content).values())
+                self.q_from_ros = list(json.loads(q.content).values())
+            else:
+                print("DOF wrong")
+                quit()
         except:
             print("Failed to get q from ros")
             quit()
+
+    def get_current_q(self) -> List[float]:
+        return self.q_from_ros
         
     def get_current_jointstate(self):
         q = self.get_current_q()
