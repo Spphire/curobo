@@ -58,7 +58,7 @@ def unity(mes:UnityMes):
         return True
 
     pos_from_unity = unity2zup_right_frame(np.array(mes.pos+mes.quat))
-
+    uc.get_q_from_ros()
 
     if uc.homing_state:
         print("still in homing state")
