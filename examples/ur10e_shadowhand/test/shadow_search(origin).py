@@ -225,7 +225,7 @@ class HandIK_Env:
                                    little_goal_pos_quat=Pinky_list)
           
             end =time.time()
-            duration = start -end;
+            duration = start -end
             print(start-end)
             self.bullet_env.set_state(q_res)
             # print(q_res)
