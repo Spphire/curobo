@@ -11,6 +11,9 @@ its affiliates is strictly prohibited.
 # bi-teleoperation
 [link](https://github.com/Spphire/curobo/tree/dev/examples/bi-teleoperation)
 
+# shadowhand-teleoperation
+[link](https://github.com/Spphire/curobo/blob/dev/examples/ur10e_shadowhand)
+
 # cuRobo
 
 *CUDA Accelerated Robot Library*
