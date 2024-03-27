@@ -68,7 +68,7 @@
       </geometry>
     </collision>
   </link>
-  <joint name="WRJ2" type="fixed">
+  <joint name="WRJ2" type="revolute">
     <parent link="forearm" />
     <child link="wrist" />
 

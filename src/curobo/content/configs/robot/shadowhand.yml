@@ -32,7 +32,7 @@ robot_cfg:
     "thmiddle",
     "thdistal",
     ]
-    collision_sphere_buffer: 0.005
+    collision_sphere_buffer: 0.0
     collision_spheres: spheres/shadowhand_spheres.yml
     ee_link: "mfdistal"
     link_names: ["mfdistal","ffdistal","rfdistal","lfdistal","thdistal"]
@@ -88,9 +88,14 @@ robot_cfg:
     usd_path: "robot/shadowhand_description/shadowhand.usda"
     usd_robot_root: "/shadowhand"
     cspace:
-      joint_names: ["WRJ1","FFJ4","FFJ3","FFJ2","FFJ1","MFJ4","MFJ3","MFJ2","MFJ1","RFJ4","RFJ3","RFJ2","RFJ1","LFJ5","LFJ4","LFJ3","LFJ2","LFJ1","THJ5","THJ4","THJ3","THJ2","THJ1"]
+      joint_names: ["WRJ1", "WRJ2",
+      "THJ5","THJ4","THJ3","THJ2","THJ1",
+      "LFJ5","LFJ4","LFJ3","LFJ2","LFJ1",
+      "RFJ4","RFJ3","RFJ2","RFJ1",
+      "MFJ4","MFJ3","MFJ2","MFJ1",
+      "FFJ4","FFJ3","FFJ2","FFJ1",]
       cspace_distance_weight:
-        #- 0.1
+        - 0.1
         - 0.1
         - 0.1
         - 0.1
@@ -116,7 +121,7 @@ robot_cfg:
         - 0.1
 
       null_space_weight:
-        #- 1.0
+        - 1.0
         - 1.0
         - 1.0
         - 1.0
@@ -142,7 +147,7 @@ robot_cfg:
         - 1.0
         
       retract_config:
-        #- 0.0
+        - 0.0
         - 0.0
         - 0.0
         - 0.0

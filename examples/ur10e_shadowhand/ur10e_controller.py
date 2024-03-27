@@ -32,7 +32,7 @@ def get_custom_world_model(table_height=0.02):
 class Ur10eController():
     def __init__(self,
                  world_model:WorldConfig,
-                 ros_ip="10.53.21.95",
+                 ros_ip="10.9.11.1",
                  ros_port="8000"):
         self.homing_state=False
         self.tracking_state=False
@@ -41,19 +41,23 @@ class Ur10eController():
         self.world_model = world_model
         self.ros_ip = ros_ip
         self.ros_port = ros_port
-        self.joint_names = ['ra_shoulder_pan_joint', 'ra_shoulder_lift_joint', 
-                            'ra_elbow_joint', 'ra_wrist_1_joint', 
-                            'ra_wrist_2_joint', 'ra_wrist_3_joint']
+        self.joint_names = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint',]
+                            #'WRJ2',] # 'WRJ1',]
 
         self.DOF=6
 
         self.get_q_from_ros()
         print("connected to ros!")
+        self.hand_model = Shadowhand_Model()
         self.init_mpc()
+        #self.init_hand_mpc()
         
 
     def init_mpc(self,config_name="ur10e.yml"):
         robot_cfg = load_yaml(join_path(get_robot_configs_path(), config_name))["robot_cfg"]
+
+        robot_cfg['kinematics']['cspace']['retract_config'] = self.get_current_q()
+
         self.robot_cfg = RobotConfig.from_dict(robot_cfg, self.tensor_args)
         self.mpc_config = MpcSolverConfig.load_from_robot_config(
             self.robot_cfg,
@@ -91,7 +95,15 @@ class Ur10eController():
 
         self.past_pose = None
         self.past_rot = None
+
+        for i in range(10):
+            print(i)
+            self.get_q_from_ros()
+            self.mpc_excute(target=self.get_current_tcp(), can_move=False)
+            time.sleep(0.05)
         print("mpc inited!")
+
+    
 
 
     def init_retract(self,tensor):
@@ -117,6 +129,8 @@ class Ur10eController():
             q = requests.post("http://"+self.ros_ip+":"+self.ros_port+"/getJoints")
             if len(list(json.loads(q.content).values()))==self.DOF:
                 self.q_from_ros = list(json.loads(q.content).values())
+                #self.q_from_ros.append(0.0)
+                # self.q_from_ros.append(0.0)
             else:
                 print("DOF wrong")
                 quit()
@@ -128,8 +142,8 @@ class Ur10eController():
         return self.q_from_ros
         
     def get_current_jointstate(self):
-        q = self.get_current_q()
-        return JointState.from_position(self.tensor_args.to_device(q), joint_names=self.joint_names)
+        q = np.array(self.get_current_q()).flatten()
+        return JointState.from_position(self.tensor_args.to_device(q.tolist()), joint_names=self.joint_names)
 
     def get_current_tcp(self) -> np.ndarray:
         if hasattr(self, 'mpc'):
@@ -139,10 +153,10 @@ class Ur10eController():
             pos = state.ee_pos_seq.cpu().numpy().flatten()
             tcp = np.array(pos.tolist() + state.ee_quat_seq.cpu().numpy().flatten().tolist())
             return tcp
-        elif hasattr(self, 'motion_gen'):
-            state = self.motion_gen.kinematics.get_state(self.tensor_args.to_device(self.get_current_q()).view(1,self.DOF))
-            tcp = np.ravel(state.ee_pose.to_list())
-            return tcp
+        # elif hasattr(self, 'motion_gen'):
+            # state = self.motion_gen.kinematics.get_state(self.tensor_args.to_device(self.get_current_q()).view(1,self.DOF))
+            # tcp = np.ravel(state.ee_pose.to_list())
+            # return tcp
         else:
             raise NotImplementedError
         
@@ -183,7 +197,8 @@ class Ur10eController():
     def robot_go_home():
         pass
 
-    def mpc_excute(self, target:np.ndarray):
+    def mpc_excute(self, target:np.ndarray, can_move=True):
+        target = target.flatten()
         target_position, target_orientation = target[:3],target[3:]
 
         if self.past_pose is None: self.past_pose = target_position + 1.0
@@ -196,8 +211,8 @@ class Ur10eController():
         ):
             
             ik_goal = Pose(
-                position=self.tensor_args.to_device(target_position),
-                quaternion=self.tensor_args.to_device(target_orientation),
+                position=self.tensor_args.to_device(target_position.tolist()),
+                quaternion=self.tensor_args.to_device(target_orientation.tolist()),
             )
             
             self.goal_buffer.goal_pose.copy_(ik_goal)
@@ -209,5 +224,38 @@ class Ur10eController():
             
 
         mpc_result = self.mpc.step(self.get_current_jointstate(), max_attempts=2)
-        state = mpc_result.js_action.position.cpu().numpy().reshape(self.DOF)
-        self.move(state[:self.DOF].flatten().tolist())
+        if can_move:
+            state = mpc_result.js_action.position.cpu().numpy().reshape(self.DOF)
+            self.move(state[:self.DOF].flatten().tolist())
+
+class Shadowhand_Model():
+    def __init__(self) -> None:
+        self.world_model = get_custom_world_model()
+        self.tensor_args = TensorDeviceType()
+        self.init_hand_mpc()
+
+    def init_hand_mpc(self, config_name = "shadowhand.yml"):
+        robot_cfg = load_yaml(join_path(get_robot_configs_path(), config_name))["robot_cfg"]
+        self.hand_robot_cfg = RobotConfig.from_dict(robot_cfg, self.tensor_args)
+        self.hand_mpc_config = MpcSolverConfig.load_from_robot_config(
+            self.hand_robot_cfg,
+            self.world_model,
+            use_cuda_graph=True,
+            use_cuda_graph_metrics=True,
+            use_cuda_graph_full_step=False,
+            use_lbfgs=False,
+            use_es=False,
+            use_mppi=True,
+            store_rollouts=True,
+            step_dt=0.02,
+        )
+        self.hand_mpc = MpcSolver(self.hand_mpc_config)
+    
+    def get_kinematics_state(self, q: np.ndarray):
+        joinstate = JointState.from_position(self.tensor_args.to_device(q.tolist()), joint_names=self.hand_mpc.rollout_fn.joint_names)
+        return self.hand_mpc.rollout_fn.compute_kinematics(joinstate)
+
+if __name__ == "__main__":
+    #uc = Ur10eController(get_custom_world_model())
+    sh = Shadowhand_Model()
+    sh.get_kinematics_state()

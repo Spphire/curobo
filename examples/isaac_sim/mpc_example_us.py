@@ -42,7 +42,7 @@ parser.add_argument(
     default=False,
 )
 
-parser.add_argument("--robot", type=str, default="franka.yml", help="robot configuration to load")
+parser.add_argument("--robot", type=str, default="ur10e.yml", help="robot configuration to load")
 args = parser.parse_args()
 
 ###########################################################
@@ -437,7 +437,7 @@ def main():
 
         cmd_state = cmd_state_full.get_ordered_joint_state(common_js_names)
         cmd_state_full = cmd_state
-
+        print(cmd_state.position.cpu().numpy())
         art_action = ArticulationAction(
             cmd_state.position.cpu().numpy(),
             # cmd_state.velocity.cpu().numpy(),

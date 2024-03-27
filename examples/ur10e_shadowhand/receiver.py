@@ -22,7 +22,7 @@ def unity2zup_right_frame(pos_quat):
         return target
 
 class Receiver(Thread):
-    def __init__(self, controller:Ur10eController, local_ip= "10.53.21.90",port=8082):
+    def __init__(self, controller:Ur10eController, local_ip= "10.9.11.1",port=8082):
         self.address = (local_ip, port)
         self.socket_obj = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         #self.socket_obj.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -39,7 +39,7 @@ class Receiver(Thread):
 
     def receive(self):
         try:
-            data, _ = self.socket_obj.recvfrom(1024)
+            data, _ = self.socket_obj.recvfrom(2048)
             s=json.loads(data)
 
             if self.controller.homing_state:
@@ -57,12 +57,17 @@ class Receiver(Thread):
                 self.controller.tracking_state=False
             else:
                 if s["cmd"]==2:
-                    if self.controller.tracking_state:
-                        print("robot stop tracking")
-                        self.controller.tracking_state=False
-                    else:
+                    if not uc.tracking_state:
                         print("robot start tracking")
-                        self.controller.set_start_tcp(pos_from_unity)
+                        uc.tracking_state=True
+                        uc.set_start_tcp(pos_from_unity)
+                    
+                    
+                if s["cmd"]==-2:
+                    if uc.tracking_state:
+                        print("robot stop tracking")
+                        uc.tracking_state=False
+
 
 
 

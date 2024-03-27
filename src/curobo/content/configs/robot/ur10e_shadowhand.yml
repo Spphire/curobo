@@ -23,23 +23,23 @@ robot_cfg:
     collision_link_names: ['shoulder_link','upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link' ,'wrist_3_link',
     "forearm",
     "wrist",
-    "palm",
-    "ffproximal",
-    "ffmiddle",
-    "ffdistal",
-    "mfproximal",
-    "mfmiddle",
-    "mfdistal",
-    "rfproximal",
-    "rfmiddle",
-    "rfdistal",
-    "lfmetacarpal",
-    "lfproximal",
-    "lfmiddle",
-    "lfdistal",
-    "thproximal",
-    "thmiddle",
-    "thdistal",
+    #"palm",
+    # "ffproximal",
+    # "ffmiddle",
+    # "ffdistal",
+    # "mfproximal",
+    # "mfmiddle",
+    # "mfdistal",
+    # "rfproximal",
+    # "rfmiddle",
+    # "rfdistal",
+    # "lfmetacarpal",
+    # "lfproximal",
+    # "lfmiddle",
+    # "lfdistal",
+    # "thproximal",
+    # "thmiddle",
+    # "thdistal",
     ]
     collision_spheres: 'spheres/ur10e_shadowhand.yml'
     collision_sphere_buffer: 0.0
@@ -50,32 +50,32 @@ robot_cfg:
       "wrist_2_link": ["wrist_3_link",],
       "wrist_3_link": ["forearm"],
       
-      "forearm": ["wrist"],
-      "wrist": ["forearm"],
+      # "forearm": ["wrist"],
+      # "wrist": ["forearm"],
 
       "forearm": ["wrist","palm"],
       "wrist": ["forearm","palm"],
-      "palm": ["wrist","ffproximal","mfproximal","rfproximal","lfmetacarpal","thproximal"],
-      "lfmetacarpal": ["palm","lfproximal"],
+      #"palm": ["wrist"], # ,"ffproximal","mfproximal","rfproximal","lfmetacarpal","thproximal"],
+      # "lfmetacarpal": ["palm","lfproximal"],
 
-      "thproximal": ["paml","thmiddle"],
+      # "thproximal": ["paml","thmiddle"],
           
-      "ffproximal": ["palm","ffmiddle"],
-      "mfproximal": ["palm","mfmiddle"],
-      "rfproximal": ["palm","rfmiddle"],
-      "lfproximal": ["lfmetacarpal","lfmiddle"],
+      # "ffproximal": ["palm","ffmiddle"],
+      # "mfproximal": ["palm","mfmiddle"],
+      # "rfproximal": ["palm","rfmiddle"],
+      # "lfproximal": ["lfmetacarpal","lfmiddle"],
           
-      "thmiddle": ["thproximal","thdistal"],
-      "ffmiddle": ["ffproximal","ffdistal"],
-      "mfmiddle": ["mfproximal","mfdistal"],
-      "rfmiddle": ["rfproximal","rfdistal"],
-      "lfmiddle": ["lfproximal","lfdistal"],
+      # "thmiddle": ["thproximal","thdistal"],
+      # "ffmiddle": ["ffproximal","ffdistal"],
+      # "mfmiddle": ["mfproximal","mfdistal"],
+      # "rfmiddle": ["rfproximal","rfdistal"],
+      # "lfmiddle": ["lfproximal","lfdistal"],
           
-      "thdistal": ["thmiddle"],
-      "ffdistal": ["ffmiddle"],
-      "mfdistal": ["mfmiddle"],
-      "rfdistal": ["rfmiddle"],
-      "lfdistal": ["lfmiddle"],
+      # "thdistal": ["thmiddle"],
+      # "ffdistal": ["ffmiddle"],
+      # "mfdistal": ["mfmiddle"],
+      # "rfdistal": ["rfmiddle"],
+      # "lfdistal": ["lfmiddle"],
       }
     self_collision_buffer: {
       'shoulder_link': 0.07,
@@ -87,64 +87,65 @@ robot_cfg:
 
       "forearm": 0.0,
       "wrist": 0.0,
-      "palm": 0.0,
-      "ffproximal": 0.0,
-      "ffmiddle": 0.0,
-      "ffdistal": 0.0,
-      "mfproximal": 0.0,
-      "mfmiddle": 0.0,
-      "mfdistal": 0.0,
-      "rfproximal": 0.0,
-      "rfmiddle": 0.0,
-      "rfdistal": 0.0,
-      "lfmetacarpal": 0.0,
-      "lfproximal": 0.0,
-      "lfmiddle": 0.0,
-      "lfdistal": 0.0,
-      "thproximal": 0.0,
-      "thmiddle": 0.0,
-      "thdistal": 0.0,
+      #"palm": 0.0,
+      # "ffproximal": 0.0,
+      # "ffmiddle": 0.0,
+      # "ffdistal": 0.0,
+      # "mfproximal": 0.0,
+      # "mfmiddle": 0.0,
+      # "mfdistal": 0.0,
+      # "rfproximal": 0.0,
+      # "rfmiddle": 0.0,
+      # "rfdistal": 0.0,
+      # "lfmetacarpal": 0.0,
+      # "lfproximal": 0.0,
+      # "lfmiddle": 0.0,
+      # "lfdistal": 0.0,
+      # "thproximal": 0.0,
+      # "thmiddle": 0.0,
+      # "thdistal": 0.0,
     }
     #mesh_link_names: [ 'shoulder_link','upper_arm_link', 'forearm_link', 'wrist_1_link', 'wrist_2_link' ,'wrist_3_link' ]
-    lock_joints: {
-      'WRJ2': 0.0, 'WRJ1': 0.0,
-      'THJ5': 0.0, 'THJ4': 0.0, 'THJ3': 0.0, 'THJ2': 0.0, 'THJ1': 0.0,
-      'LFJ5': 0.0, 'LFJ4': 0.0, 'LFJ3': 0.0, 'LFJ2': 0.0, 'LFJ1': 0.0,
-      'RFJ4': 0.0, 'RFJ3': 0.0, 'RFJ2': 0.0, 'RFJ1': 0.0,
-      'MFJ4': 0.0, 'MFJ3': 0.0, 'MFJ2': 0.0, 'MFJ1': 0.0,
-      'FFJ4': 0.0, 'FFJ3': 0.0, 'FFJ2': 0.0, 'FFJ1': 0.0
-    }
+    lock_joints: null
+    # {
+    #   'WRJ2': 0.0, 'WRJ1': 0.0,
+    #   'THJ5': 0.0, 'THJ4': 0.0, 'THJ3': 0.0, 'THJ2': 0.0, 'THJ1': 0.0,
+    #   'LFJ5': 0.0, 'LFJ4': 0.0, 'LFJ3': 0.0, 'LFJ2': 0.0, 'LFJ1': 0.0,
+    #   'RFJ4': 0.0, 'RFJ3': 0.0, 'RFJ2': 0.0, 'RFJ1': 0.0,
+    #   'MFJ4': 0.0, 'MFJ3': 0.0, 'MFJ2': 0.0, 'MFJ1': 0.0,
+    #   'FFJ4': 0.0, 'FFJ3': 0.0, 'FFJ2': 0.0, 'FFJ1': 0.0
+    # }
 
     cspace:
       joint_names: ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint',
-      'WRJ2', 'WRJ1',
-      'THJ5', 'THJ4', 'THJ3', 'THJ2', 'THJ1',
-      'LFJ5', 'LFJ4', 'LFJ3', 'LFJ2', 'LFJ1',
-      'RFJ4', 'RFJ3', 'RFJ2', 'RFJ1',
-      'MFJ4', 'MFJ3', 'MFJ2', 'MFJ1',
-      'FFJ4', 'FFJ3', 'FFJ2', 'FFJ1']
+      'WRJ2',] # 'WRJ1',]
+      # 'THJ5', 'THJ4', 'THJ3', 'THJ2', 'THJ1',
+      # 'LFJ5', 'LFJ4', 'LFJ3', 'LFJ2', 'LFJ1',
+      # 'RFJ4', 'RFJ3', 'RFJ2', 'RFJ1',
+      # 'MFJ4', 'MFJ3', 'MFJ2', 'MFJ1',
+      # 'FFJ4', 'FFJ3', 'FFJ2', 'FFJ1']
       
       retract_config: [0.0004430418193805963, -1.6971481482135218, 2.4696645736694336, -0.6649912039386194, 1.6591527462005615, 0.014633487910032272,
-      0.0, 0.0,
-      0.0, 0.0, 0.0, 0.0, 0.0,
-      0.0, 0.0, 0.0, 0.0, 0.0,
-      0.0, 0.0, 0.0, 0.0,
-      0.0, 0.0, 0.0, 0.0,
-      0.0, 0.0, 0.0, 0.0]
+      0.0,] # 0.0,]
+      # 0.0, 0.0, 0.0, 0.0, 0.0,
+      # 0.0, 0.0, 0.0, 0.0, 0.0,
+      # 0.0, 0.0, 0.0, 0.0,
+      # 0.0, 0.0, 0.0, 0.0,
+      # 0.0, 0.0, 0.0, 0.0]
       null_space_weight: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-      1.0, 1.0,
-      1.0, 1.0, 1.0, 1.0, 1.0,
-      1.0, 1.0, 1.0, 1.0, 1.0,
-      1.0, 1.0, 1.0, 1.0,
-      1.0, 1.0, 1.0, 1.0,
-      1.0, 1.0, 1.0, 1.0]
+      1.0,] # 1.0,]
+      # 1.0, 1.0, 1.0, 1.0, 1.0,
+      # 1.0, 1.0, 1.0, 1.0, 1.0,
+      # 1.0, 1.0, 1.0, 1.0,
+      # 1.0, 1.0, 1.0, 1.0,
+      # 1.0, 1.0, 1.0, 1.0]
       cspace_distance_weight: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-      1.0, 1.0,
-      1.0, 1.0, 1.0, 1.0, 1.0,
-      1.0, 1.0, 1.0, 1.0, 1.0,
-      1.0, 1.0, 1.0, 1.0,
-      1.0, 1.0, 1.0, 1.0,
-      1.0, 1.0, 1.0, 1.0]
+      1.0,] # 1.0,]
+      # 1.0, 1.0, 1.0, 1.0, 1.0,
+      # 1.0, 1.0, 1.0, 1.0, 1.0,
+      # 1.0, 1.0, 1.0, 1.0,
+      # 1.0, 1.0, 1.0, 1.0,
+      # 1.0, 1.0, 1.0, 1.0]
       max_jerk: 500.0
       max_acceleration: 12.0
       position_limit_clip: 0.1

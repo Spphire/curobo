@@ -11,6 +11,9 @@ import uvicorn
 from pydantic import BaseModel
 from typing import List
 from curobo.geom.types import WorldConfig, Cuboid
+from rfplanner import Rfplanner
+import math
+
 
 def get_custom_world_model(table_height=0.02):
     table = Cuboid(
@@ -30,6 +33,12 @@ class UnityMes(BaseModel):
     quat:List[float]
     cmd:int
 
+    thumbTip:List[float]
+    indexTip:List[float]
+    middleTip:List[float]
+    ringTip:List[float]
+    pinkyTip:List[float]
+
 def unity2zup_right_frame(pos_quat):
         pos_quat*=np.array([1,-1,1,1,-1,1,-1])
         rot_mat = t3d.quaternions.quat2mat(pos_quat[3:])
@@ -44,18 +53,39 @@ def unity2zup_right_frame(pos_quat):
         target = np.array(target_pos_vec.tolist()+t3d.quaternions.mat2quat(target_rot_mat).tolist())
         return target
 
+def check_format(s:dict):
+    try:
+        for n in ["indexTip","middleTip","ringTip","pinkyTip"]:
+            if len(s[n])!=7:
+                return False
+        if len(s["thumbTip"])!=7:
+                return False
+        if len(s["pos"])!=3:
+                return False
+        if len(s["quat"])!=4:
+                return False
+            
+        return True
+    except:
+        return False
+
 uc = Ur10eController(get_custom_world_model())
+rfplanner = Rfplanner()
 
 app = FastAPI()
 
 @app.post('/unity')
 def unity(mes:UnityMes):
+    if not check_format(mes.__dict__):
+        print("hand message format wrong!")
+        return {'status':'ok'}
+
     if uc.homing_state:
-        return True
+        return {'status':'ok'}
 
     if mes.cmd==3:
         uc.robot_go_home()
-        return True
+        return {'status':'ok'}
 
     pos_from_unity = unity2zup_right_frame(np.array(mes.pos+mes.quat))
     uc.get_q_from_ros()
@@ -92,10 +122,12 @@ def unity(mes:UnityMes):
             target =uc.get_current_tcp()
             #print(target)
         else:
+            mes.q[2:7] = rfplanner.get_thumb_q(mes.__dict__,) # uc.hand_model.get_kinematics_state(np.array(mes.q)/180*math.pi).link_pose)
             uc.move_hand(mes.q)
-
         uc.mpc_excute(target)
+
+        
     return {'status':'ok'}
 
 if __name__ == "__main__":
-    uvicorn.run(app,host="10.53.21.90", port=8000)
+    uvicorn.run(app,host="10.9.11.1", port=8082) #, log_level="critical")
