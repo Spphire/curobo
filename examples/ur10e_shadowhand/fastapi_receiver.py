@@ -26,18 +26,26 @@ def get_custom_world_model(table_height=0.02):
         cuboid=[table],
     )
 
+class HandMes(BaseModel):
+    q: List[float]
+
+    pos: List[float]
+    quat: List[float]
+
+    thumbTip: List[float]
+    indexTip: List[float]
+    middleTip: List[float]
+    ringTip: List[float]
+    pinkyTip: List[float]
+
 class UnityMes(BaseModel):
-    q:List[float]
     isTracking:int
-    pos:List[float]
-    quat:List[float]
     cmd:int
 
-    thumbTip:List[float]
-    indexTip:List[float]
-    middleTip:List[float]
-    ringTip:List[float]
-    pinkyTip:List[float]
+    leftHand:HandMes
+    rightHand:HandMes
+
+
 
 def unity2zup_right_frame(pos_quat):
         pos_quat*=np.array([1,-1,1,1,-1,1,-1])
@@ -76,7 +84,7 @@ app = FastAPI()
 
 @app.post('/unity')
 def unity(mes:UnityMes):
-    if not check_format(mes.__dict__):
+    if not check_format(mes.rightHand.__dict__):
         print("hand message format wrong!")
         return {'status':'ok'}
 
@@ -87,7 +95,7 @@ def unity(mes:UnityMes):
         uc.robot_go_home()
         return {'status':'ok'}
 
-    pos_from_unity = unity2zup_right_frame(np.array(mes.pos+mes.quat))
+    pos_from_unity = unity2zup_right_frame(np.array(mes.rightHand.pos+mes.rightHand.quat))
     uc.get_q_from_ros()
 
     if uc.homing_state:
@@ -122,8 +130,8 @@ def unity(mes:UnityMes):
             target =uc.get_current_tcp()
             #print(target)
         else:
-            mes.q[2:7] = rfplanner.get_thumb_q(mes.__dict__,) # uc.hand_model.get_kinematics_state(np.array(mes.q)/180*math.pi).link_pose)
-            uc.move_hand(mes.q)
+            mes.rightHand.q[2:7] = rfplanner.get_thumb_q(mes.rightHand.__dict__,) # uc.hand_model.get_kinematics_state(np.array(mes.q)/180*math.pi).link_pose)
+            uc.move_hand(mes.rightHand.q)
         uc.mpc_excute(target)
 
         
