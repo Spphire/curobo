@@ -16,6 +16,10 @@ from scipy.spatial.transform import Rotation as R
 from BulletEnv import BulletEnv
 from SingleHandPlanner import RfHandPlanner
 from rf_robot_planner import HandPlannerIKType
+
+current_path = os.path.abspath(__file__)
+parent_path = os.path.dirname(os.path.dirname(current_path))
+sys.path.append(parent_path)
 from ur10e_controller import Shadowhand_Model
 
 # def unity2zup_right_frame(pos_quat: np.ndarray):
@@ -45,6 +49,20 @@ def unity2zup_right_frame(pos_quat: np.ndarray):
         fit_mat = t3d.euler.axangle2mat([0,1,0],-np.pi/2)
         #fit_mat = fit_mat@t3d.euler.axangle2mat([0,0,1],-np.pi/2)
         fit_mat = fit_mat@t3d.euler.axangle2mat([1,0,0],np.pi)
+        target_rot_mat=fit_mat@rot_mat
+        target_pos_vec=fit_mat@pos_vec
+        target = np.array(target_pos_vec.tolist()+t3d.quaternions.mat2quat(target_rot_mat).tolist())
+        return target
+
+def unity2zup_right_frame2(pos_quat):
+        pos_quat*=np.array([1,-1,1,1,-1,1,-1])
+        rot_mat = t3d.quaternions.quat2mat(pos_quat[3:])
+        pos_vec = pos_quat[:3]
+        T=np.eye(4)
+        T[:3,:3]= rot_mat
+        T[:3,3]=pos_vec
+        fit_mat = t3d.euler.axangle2mat([0,1,0],np.pi/2)
+        fit_mat = fit_mat@t3d.euler.axangle2mat([0,0,1],-np.pi/2)
         target_rot_mat=fit_mat@rot_mat
         target_pos_vec=fit_mat@pos_vec
         target = np.array(target_pos_vec.tolist()+t3d.quaternions.mat2quat(target_rot_mat).tolist())
@@ -123,6 +141,8 @@ class Receiver(Thread):
         self.hand_planner = RfHandPlanner("SingleUR_10_Shadow.yaml",ign_vec=ign_vec)
         self.bullet_env = BulletEnv(self.hand_planner.rfYamlConfig.getHomePose(),fcl_planner=self.hand_planner)
 
+        self.tracking_state=False
+
     def IK(self,tcp_pos_quat =None,current_activate=False):
         tcp_goal = np.array([tcp_pos_quat[0],tcp_pos_quat[1],tcp_pos_quat[2],
                              tcp_pos_quat[3],tcp_pos_quat[4],tcp_pos_quat[5],tcp_pos_quat[6]])
@@ -158,6 +178,7 @@ class Receiver(Thread):
             self.receive()
             time.sleep(0.01)
 
+
     def receive(self):
         s=dict()
         try:
@@ -165,6 +186,20 @@ class Receiver(Thread):
             s=json.loads(data)
         except:
              return
+        
+        pos_from_unity = unity2zup_right_frame2(np.array(s["pos"]+s["quat"]))
+        if s["cmd"]==2:
+            if not self.tracking_state:
+                print("robot start tracking")
+                self.tracking_state=True
+                #uc.set_start_tcp(pos_from_unity)       
+        if s["cmd"]==-2:
+            if self.tracking_state:
+                print("robot stop tracking")
+                self.tracking_state=False
+
+        arm_q = self.IK(tcp_pos_quat=pos_from_unity)
+
 
         s["q"] = np.array(s["q"])/180*math.pi
 
@@ -174,14 +209,14 @@ class Receiver(Thread):
                             current_activate = False,
                             finger_type = HandPlannerIKType.ThumbIK,
                             is_hard=True)
-        q_goal = getRobotGraspJointVaules([0.0004430418193805963, -1.6971481482135218, 2.4696645736694336, -0.6649912039386194, 1.6591527462005615, 0.014633487910032272,],
+        q_goal = getRobotGraspJointVaules(arm_q, # [0.0004430418193805963, -1.6971481482135218, 2.4696645736694336, -0.6649912039386194, 1.6591527462005615, 0.014633487910032272,],
                                             q_thumb_values=q_thumb_g,
                                             q_first_values=s["q"][20:24][::-1],
                                             q_middle_values=s["q"][16:20][::-1],
                                             q_ring_vaules=s["q"][12:16][::-1],
                                             q_little_values=s["q"][7:12][::-1])
         s["q"][2:7] = q_thumb_g[::-1]
-        print(self.hand_model.get_kinematics_state(s["q"].tolist()).link_pose)
+        #print(self.hand_model.get_kinematics_state(s["q"].tolist()).link_pose)
         s["q"] = s["q"]*180/math.pi
         #requests.post("http://10.9.11.1:8000/move_hand",json.dumps({'q': s["q"].tolist()}), timeout=0.05)
         self.bullet_env.set_state(q_goal)

@@ -9,19 +9,43 @@ ur10e_controller.py
 rfplanner.py
 
 # Usage
-in shadowhand ros environment run:
+Release machine and start nuc
+
+connect ssh to the nuc
 ```bash
-python3 ros_side.py
+ssh user@10.9.11.2
+```
+password: shadow251nuc
+
+In ssh terminal:
+```bash
+roscd sr_robot_launch/scripts/
+./shadow_right_arm_hand_hardware_control_loop.sh 
 ```
 
-in rfplanner+curobo environment run:
+After fully run command above(important), in another ssh terminal:
 ```bash
-python fastapi_receiver.py
+roscd sr_robot_launch/scripts/
+./shadow_right_arm_hand_hardware_control_loop.sh 
 ```
 
-start qeust3 unity app
+open another terminal:
+```bash
+source ~/workspace/shadow_ros/devel/setup.bash #to activate ros environment
+cd ~/workspace/syb/curobo
+python3 examples/ur10e_shadowhand/ros_side.py
+```
 
-hold menu button (三) to set blue arrow facing east
+open another terminal:
+```bash
+conda activate rfplanner #to activate rfplanner+curobo environment
+cd ~/workspace/syb/curobo
+python examples/ur10e_shadowhand/fastapi_receiver.py
+```
+
+In Quest3, make sure wifi connected to 'ASUS_80_5G', and run unity app
+
+hold menu button (三) to set blue arrow facing to east
 
 press x button to start
 
