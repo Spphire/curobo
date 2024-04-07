@@ -23,20 +23,20 @@ roscd sr_robot_launch/scripts/
 ./shadow_right_arm_hand_hardware_control_loop.sh 
 ```
 
-After fully run command above(important), in another ssh terminal:
+After fully run command above(important for rviz), in another ssh terminal:
 ```bash
 roscd sr_robot_launch/scripts/
 ./shadow_right_arm_hand_hardware_control_loop.sh 
 ```
 
-open another terminal:
+open a normal terminal:
 ```bash
 source ~/workspace/shadow_ros/devel/setup.bash #to activate ros environment
 cd ~/workspace/syb/curobo
 python3 examples/ur10e_shadowhand/ros_side.py
 ```
 
-open another terminal:
+open another normal terminal:
 ```bash
 conda activate rfplanner #to activate rfplanner+curobo environment
 cd ~/workspace/syb/curobo

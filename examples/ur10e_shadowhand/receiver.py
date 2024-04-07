@@ -39,9 +39,9 @@ class Receiver(Thread):
 
     def receive(self):
         try:
-            data, _ = self.socket_obj.recvfrom(2048)
+            data, _ = self.socket_obj.recvfrom(4096)
             s=json.loads(data)
-
+            print(s)
             if self.controller.homing_state:
                 return True
 

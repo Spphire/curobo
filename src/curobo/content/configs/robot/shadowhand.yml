@@ -35,7 +35,7 @@ robot_cfg:
     collision_sphere_buffer: 0.0
     collision_spheres: spheres/shadowhand_spheres.yml
     ee_link: "mfdistal"
-    link_names: ["mfdistal","ffdistal","rfdistal","lfdistal","thdistal"]
+    link_names: ["mfdistal","ffdistal","rfdistal","lfdistal","thdistal", "palm"]
     self_collision_buffer: {
     "forearm": 0.0,
     "wrist": 0.0,

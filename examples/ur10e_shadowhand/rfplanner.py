@@ -90,14 +90,20 @@ class Rfplanner():
         nearest_tip = self.search_nearest_tip(s)
         _thumb = self.get_relative_tcp_rfplanner(np.array(s["thumbTip"]),np.array(s["pos"]+s["quat"]))
         _nearest_tip = self.get_relative_tcp_rfplanner(np.array(s[nearest_tip]),np.array(s["pos"]+s["quat"]))
-
+        #print(nearest_tip, _nearest_tip)
         if finger_tcp is None:
              nearest_tip_fk = _nearest_tip
         else:
-            print(finger_tcp.keys(), finger_tcp.values(), self.tip_names_map[nearest_tip])
+            #print(finger_tcp.keys(), finger_tcp.values(), self.tip_names_map[nearest_tip])
             pose = finger_tcp[self.tip_names_map[nearest_tip]]
-            nearest_tip_fk = pose.position.numpy().cpu().tolist()+[0,1,0,0] # pose.quaternion.numpy().cpu().tolist()
+            palm_pose = finger_tcp["palm"]
+            #print(palm_pose.quaternion)
+            nearest_tip_fk = (pose.position.cpu().numpy()-palm_pose.position.cpu().numpy()).flatten().tolist()+[0,1,0,0] # pose.quaternion.cpu().numpy().tolist()
         
+        #print(_thumb,_nearest_tip,nearest_tip_fk)
+        _thumb[0]*=1.3
+        _thumb[1]+=0.01
+        _thumb[2]-=0.01
         res = (_thumb[:3]-_nearest_tip[:3]) + nearest_tip_fk[:3]
 
         return np.array(res.tolist()+_thumb[3:].tolist())

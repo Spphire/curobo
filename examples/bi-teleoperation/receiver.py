@@ -42,7 +42,7 @@ class Receiver(Thread):
 
     def receive(self):
         try:
-            data, _ = self.socket_obj.recvfrom(1024)
+            data, _ = self.socket_obj.recvfrom(4096)
             s=json.loads(data)
 
             if self.controller.left_robot.homing_state or self.controller.right_robot.homing_state:

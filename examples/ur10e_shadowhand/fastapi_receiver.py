@@ -38,10 +38,10 @@ class HandMes(BaseModel):
     ringTip: List[float]
     pinkyTip: List[float]
 
-class UnityMes(BaseModel):
-    isTracking:int
     cmd:int
 
+class UnityMes(BaseModel):
+    valid:bool
     leftHand:HandMes
     rightHand:HandMes
 
@@ -91,7 +91,7 @@ def unity(mes:UnityMes):
     if uc.homing_state:
         return {'status':'ok'}
 
-    if mes.cmd==3:
+    if mes.rightHand.cmd==3:
         uc.robot_go_home()
         return {'status':'ok'}
 
@@ -102,14 +102,14 @@ def unity(mes:UnityMes):
         print("still in homing state")
         uc.tracking_state=False
     else:
-        if mes.cmd==2:
+        if mes.rightHand.cmd==2:
             if not uc.tracking_state:
                 print("robot start tracking")
                 uc.tracking_state=True
                 uc.set_start_tcp(pos_from_unity)
             
             
-        if mes.cmd==-2:
+        if mes.rightHand.cmd==-2:
             if uc.tracking_state:
                 print("robot stop tracking")
                 uc.tracking_state=False
@@ -130,7 +130,7 @@ def unity(mes:UnityMes):
             target =uc.get_current_tcp()
             #print(target)
         else:
-            mes.rightHand.q[2:7] = rfplanner.get_thumb_q(mes.rightHand.__dict__,) # uc.hand_model.get_kinematics_state(np.array(mes.q)/180*math.pi).link_pose)
+            mes.rightHand.q[2:7] = rfplanner.get_thumb_q(mes.rightHand.__dict__,) # uc.hand_model.get_link_pose(np.array(mes.rightHand.q)/180*math.pi))
             uc.move_hand(mes.rightHand.q)
         uc.mpc_excute(target)
 
