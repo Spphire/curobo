@@ -121,7 +121,7 @@ class Rfplanner():
             
         return True
 
-    def get_thumb_q(self, s:dict, finger_tcp: dict = None):
+    def get_thumb_q(self, s:dict, finger_tcp: dict = None)->np.ndarray:
         if not self.check_format(s):
              print("hand message format wrong!")
              return [0.0]*5
@@ -133,4 +133,35 @@ class Rfplanner():
                             current_activate = False,
                             finger_type = HandPlannerIKType.ThumbIK,
                             is_hard=True)
-        return np.array(q_thumb_g)[::-1]*180/math.pi
+        return np.array(q_thumb_g)[::-1]*180/math.pi 
+    
+if __name__ == '__main__':
+    import fastapi
+    import uvicorn
+    from pydantic import BaseModel
+    from typing import List
+
+    rfplanner = Rfplanner()
+
+    class HandMes(BaseModel):
+        q: List[float]
+
+        pos: List[float]
+        quat: List[float]
+
+        thumbTip: List[float]
+        indexTip: List[float]
+        middleTip: List[float]
+        ringTip: List[float]
+        pinkyTip: List[float]
+
+        cmd:int
+
+    app=fastapi.FastAPI()
+
+    @app.post("/get_thumb_q")
+    def get_thumb_q(handMes: HandMes):
+        q=rfplanner.get_thumb_q(handMes.__dict__)
+        return q.tolist()
+    
+    uvicorn.run(app,host="127.0.0.1", port=8080)
