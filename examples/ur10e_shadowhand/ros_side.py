@@ -37,7 +37,7 @@ joint_names = [
 ]
 
 joint_names_hand = [
-                'rh_WRJ1', 'rh_WRJ2',
+                'rh_WRJ2', 'rh_WRJ1',
                 'rh_THJ5', 'rh_THJ4', 'rh_THJ3', 'rh_THJ2', 'rh_THJ1',
 
                 'rh_LFJ5', 'rh_LFJ4', 'rh_LFJ3', 'rh_LFJ2', 'rh_LFJ1',
@@ -59,7 +59,13 @@ app=fastapi.FastAPI()
 @app.post("/getJoints")
 def get_joints():
     q=arm_commander.get_current_state()
-    return q
+    hq=hand_commander.get_current_state()
+    res=[]
+    for n in joint_names:
+        res.append(q[n])
+    for n in joint_names_hand[:2]:
+        res.append(hq[n])
+    return res
 
 @app.post("/handJoints")
 def test(joint: HandJoints):
@@ -70,12 +76,19 @@ def test(joint: HandJoints):
 @app.post("/move")
 def move(joint: ArmJoints):
     print(joint.q)
-    arm_home_joints_goal_target = {i:j for (i, j) in zip(joint_names, joint.q)}
+    arm_home_joints_goal_target = {i:j for (i, j) in zip(joint_names, joint.q[:6])}
     arm_commander.move_to_joint_value_target_unsafe(
         arm_home_joints_goal_target,
         0.01,  # time duration
         False  # wait for return
     )
+    if(len(joint.q)>6):
+        hand_joints_goal_target = {i:j for (i, j) in zip(joint_names_hand[:2], joint.q[6:])}
+        hand_commander.move_to_joint_value_target_unsafe(
+            hand_joints_goal_target,
+            0.01,  # time duration
+            False  # wait for return
+        )
     return {'status':'ok'}
 
 @app.post("/move_hand")

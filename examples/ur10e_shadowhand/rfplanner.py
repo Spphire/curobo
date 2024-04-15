@@ -102,7 +102,8 @@ class Rfplanner():
         
         #print(_thumb,_nearest_tip,nearest_tip_fk)
         _thumb[0]*=1.3
-        _thumb[1]+=0.01
+        _thumb[1]+=0.03
+        _thumb[1]*=1.3
         _thumb[2]-=0.01
         res = (_thumb[:3]-_nearest_tip[:3]) + nearest_tip_fk[:3]
 
@@ -164,4 +165,4 @@ if __name__ == '__main__':
         q=rfplanner.get_thumb_q(handMes.__dict__)
         return q.tolist()
     
-    uvicorn.run(app,host="127.0.0.1", port=8080)
+    uvicorn.run(app,host="0.0.0.0", port=8080)

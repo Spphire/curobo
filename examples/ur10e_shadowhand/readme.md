@@ -26,7 +26,7 @@ roscd sr_robot_launch/scripts/
 After fully run command above(important for rviz), in another ssh terminal:
 ```bash
 roscd sr_robot_launch/scripts/
-./shadow_right_arm_hand_hardware_control_loop.sh 
+./shadow_right_arm_hand_gui.sh 
 ```
 
 open a normal terminal:

@@ -36,7 +36,7 @@ class Ur10eController():
                  world_model:WorldConfig,
                  ros_ip="10.9.11.1",
                  ros_port="8000",
-                 config_name="ur10e.yml"):
+                 config_name="ur10e.yml"): #"ur10e_shadowhand.yml"):
         self.DOF=6
         self.ros_ip = ros_ip
         self.ros_port = ros_port
@@ -54,8 +54,8 @@ class Ur10eController():
         self.robot_cfg = RobotConfig.from_dict(robot_cfg, self.tensor_args)
 
         
-        self.joint_names = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint',]
-                            #'WRJ2',] # 'WRJ1',]
+        self.joint_names = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint',
+                            'WRJ2', 'WRJ1',]
 
         
 
@@ -150,12 +150,12 @@ class Ur10eController():
     def get_q_from_ros(self):
         try:
             q = requests.post("http://"+self.ros_ip+":"+self.ros_port+"/getJoints")
-            if len(list(json.loads(q.content).values()))==self.DOF:
-                self.q_from_ros = list(json.loads(q.content).values())
+            if len(json.loads(q.content))>=self.DOF:
+                self.q_from_ros = json.loads(q.content)[:self.DOF]
                 #self.q_from_ros.append(0.0)
                 # self.q_from_ros.append(0.0)
             else:
-                print("DOF wrong")
+                print("DOF wrong", json.loads(q.content))
                 quit()
         except:
             print("Failed to get q from ros")
@@ -252,13 +252,13 @@ class Ur10eController():
         ik_result = self.ik_solver.solve_single(ik_goal)
         if ik_result.success:
             ik_suc = True
-            self.q6 = ik_result.js_solution.position.cpu().numpy().reshape(self.DOF)[-1]
+            self.q6 = ik_result.js_solution.position.cpu().numpy().flatten()[5]
 
         mpc_result = self.mpc.step(self.get_current_jointstate(), max_attempts=2)
-        state = mpc_result.js_action.position.cpu().numpy().reshape(self.DOF)
+        state = mpc_result.js_action.position.cpu().numpy()
         #print(self.q6, state[:self.DOF].flatten().tolist()[-1])
         if can_move:  
-            target_q = state[:self.DOF].flatten().tolist()
+            target_q = state.flatten().tolist()
             # if ik_suc:
             #     if target_q[-1]>self.q6+math.pi:
             #         self.q6+=math.pi*2

@@ -42,7 +42,7 @@ parser.add_argument(
     default=False,
 )
 
-parser.add_argument("--robot", type=str, default="ur10e.yml", help="robot configuration to load")
+parser.add_argument("--robot", type=str, default="bimanual_srhand_ur.yml", help="robot configuration to load")
 args = parser.parse_args()
 
 ###########################################################
@@ -176,7 +176,8 @@ def main():
     )
 
     setup_curobo_logger("warn")
-    past_pose = None
+    r_past_pose = None
+    l_past_pose = None
     n_obstacle_cuboids = 30
     n_obstacle_mesh = 10
 
@@ -191,7 +192,7 @@ def main():
     
     robot_cfg["kinematics"]["collision_sphere_buffer"] += 0.02
 
-    sim_robot_cfg = load_yaml(join_path(get_robot_configs_path(), "ur10e_shadowhand.yml"))["robot_cfg"]
+    sim_robot_cfg = load_yaml(join_path(get_robot_configs_path(), args.robot))["robot_cfg"]
     j_names = sim_robot_cfg["kinematics"]["cspace"]["joint_names"]
     default_config = sim_robot_cfg["kinematics"]["cspace"]["retract_config"]
     robot, robot_prim_path = add_robot_to_scene(sim_robot_cfg, my_world)
@@ -321,16 +322,26 @@ def main():
     socket_obj = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     socket_obj.setblocking(0)
     socket_obj.bind(address)
-    hand_q = np.zeros([1,24])
-    finger_joint_name = ['WRJ2', 'WRJ1',
-      'THJ5', 'THJ4', 'THJ3', 'THJ2', 'THJ1',
-      'LFJ5', 'LFJ4', 'LFJ3', 'LFJ2', 'LFJ1',
-      'RFJ4', 'RFJ3', 'RFJ2', 'RFJ1',
-      'MFJ4', 'MFJ3', 'MFJ2', 'MFJ1',
-      'FFJ4', 'FFJ3', 'FFJ2', 'FFJ1']
-    tracking_state = False
-    start_sim_tcp = np.zeros(7)
-    start_unity_tcp = np.zeros(7)
+    r_hand_q = np.zeros([1,24])
+    l_hand_q = np.zeros([1,24])
+    finger_joint_name = ['rh_WRJ2', 'rh_WRJ1',
+      'rh_THJ5', 'rh_THJ4', 'rh_THJ3', 'rh_THJ2', 'rh_THJ1',
+      'rh_LFJ5', 'rh_LFJ4', 'rh_LFJ3', 'rh_LFJ2', 'rh_LFJ1',
+      'rh_RFJ4', 'rh_RFJ3', 'rh_RFJ2', 'rh_RFJ1',
+      'rh_MFJ4', 'rh_MFJ3', 'rh_MFJ2', 'rh_MFJ1',
+      'rh_FFJ4', 'rh_FFJ3', 'rh_FFJ2', 'rh_FFJ1']
+    l_finger_joint_name = ['lh_WRJ2', 'lh_WRJ1',
+      'lh_THJ5', 'lh_THJ4', 'lh_THJ3', 'lh_THJ2', 'lh_THJ1',
+      'lh_LFJ5', 'lh_LFJ4', 'lh_LFJ3', 'lh_LFJ2', 'lh_LFJ1',
+      'lh_RFJ4', 'lh_RFJ3', 'lh_RFJ2', 'lh_RFJ1',
+      'lh_MFJ4', 'lh_MFJ3', 'lh_MFJ2', 'lh_MFJ1',
+      'lh_FFJ4', 'lh_FFJ3', 'lh_FFJ2', 'lh_FFJ1']
+    r_tracking_state = False
+    l_tracking_state = False
+    r_start_sim_tcp = np.zeros(7)
+    r_start_unity_tcp = np.zeros(7)
+    l_start_sim_tcp = np.zeros(7)
+    l_start_unity_tcp = np.zeros(7)
 
     usd_help.load_stage(my_world.stage)
     init_world = False
@@ -379,7 +390,7 @@ def main():
             obstacles.add_obstacle(world_cfg_table.cuboid[0])
             mpc.world_coll_checker.load_collision_model(obstacles)
         
-        if False and step_index % 2 == 0:
+        if True and step_index % 2 == 0:
             sph_list = motion_gen.kinematics.get_robot_as_spheres(cu_js.position)
 
             if spheres is None:
@@ -401,59 +412,94 @@ def main():
                         spheres[si].set_radius(float(s.radius))
 
         # position and orientation of target virtual cube:
-        cube_position, cube_orientation = target.get_world_pose()
+        r_cube_position, r_cube_orientation = target.get_world_pose()
+        l_cube_position, l_cube_orientation = list(target_links.values())[0].get_world_pose()
         try:
             data, _ = socket_obj.recvfrom(4096)
             s=json.loads(data)
             q = requests.post("http://127.0.0.1:8080/get_thumb_q",json.dumps(s['rightHand']))
             q = np.array(json.loads(q.content)).reshape(5,)
-            hand_q = np.array(s['rightHand']['q'])
-            hand_q[2:7] = q
-            hand_q = hand_q.reshape([1,24])/180*np.pi
+            r_hand_q = np.array(s['rightHand']['q'])
+            r_hand_q[2:7] = q
+            r_hand_q = r_hand_q.reshape([1,24])/180*np.pi
+
+            l_hand_q = np.array(s['leftHand']['q'])
+            l_hand_q = l_hand_q.reshape([1,24])/180*np.pi
             #print(hand_q)
-            pos_from_unity = unity2zup_right_frame(np.array(s['rightHand']["pos"]+s['rightHand']["quat"]))
+            r_pos_from_unity = unity2zup_right_frame(np.array(s['rightHand']["pos"]+s['rightHand']["quat"]))
+            l_pos_from_unity = unity2zup_right_frame(np.array(s['leftHand']["pos"]+s['leftHand']["quat"]))
+
             if s['rightHand']['cmd']==2:
-                if not tracking_state:
-                    tracking_state=True
-                    start_sim_tcp = np.array(cube_position.tolist()+cube_orientation.tolist())
-                    start_unity_tcp = pos_from_unity
+                if not r_tracking_state:
+                    r_tracking_state=True
+                    r_start_sim_tcp = np.array(r_cube_position.tolist()+r_cube_orientation.tolist())
+                    r_start_unity_tcp = r_pos_from_unity
 
-            if s['rightHand']['cmd']==-2:       
-                if tracking_state:
-                    tracking_state = False
+            if s['leftHand']['cmd']==2:
+                if not l_tracking_state:
+                    l_tracking_state=True
+                    l_start_sim_tcp = np.array(l_cube_position.tolist()+l_cube_orientation.tolist())
+                    l_start_unity_tcp = l_pos_from_unity
 
-            if tracking_state:
-                target_tcp=np.zeros(7)
-                target_tcp[:3]=pos_from_unity[:3] - start_unity_tcp[:3] + start_sim_tcp[:3]
-                target_rot_mat = t3d.quaternions.quat2mat(pos_from_unity[3:]) \
-                                @ np.linalg.inv(t3d.quaternions.quat2mat(start_unity_tcp[3:])) \
-                                @ t3d.quaternions.quat2mat(start_sim_tcp[3:])
-                target_tcp[3:]=t3d.quaternions.mat2quat(target_rot_mat).tolist()
-                if np.linalg.norm(target_tcp[:3]-np.array(cube_position).flatten())>0.05:
-                    print('loss sync')
-                    tracking_state=False
+            if s['rightHand']['cmd']==-2:
+                if r_tracking_state:
+                    r_tracking_state = False
+
+            if s['leftHand']['cmd']==-2:
+                if l_tracking_state:
+                    l_tracking_state = False
+
+            if r_tracking_state:
+                r_target_tcp=np.zeros(7)
+                r_target_tcp[:3]=r_pos_from_unity[:3] - r_start_unity_tcp[:3] + r_start_sim_tcp[:3]
+                r_target_rot_mat = t3d.quaternions.quat2mat(r_pos_from_unity[3:]) \
+                                @ np.linalg.inv(t3d.quaternions.quat2mat(r_start_unity_tcp[3:])) \
+                                @ t3d.quaternions.quat2mat(r_start_sim_tcp[3:])
+                r_target_tcp[3:]=t3d.quaternions.mat2quat(r_target_rot_mat).tolist()
+                if np.linalg.norm(r_target_tcp[:3]-r_cube_position)>0.05:
+                    print('right loss sync')
+                    r_tracking_state=False
                 else:
-                    target.set_world_pose(position=target_tcp[:3],
-                          orientation=target_tcp[3:])
-        except Exception as e:
-            #print(e)
+                    target.set_world_pose(position=r_target_tcp[:3],
+                          orientation=r_target_tcp[3:])
+                
+            if l_tracking_state:
+                l_target_tcp=np.zeros(7)
+                l_target_tcp[:3]=l_pos_from_unity[:3] - l_start_unity_tcp[:3] + l_start_sim_tcp[:3]
+                l_target_rot_mat = t3d.quaternions.quat2mat(l_pos_from_unity[3:]) \
+                                @ np.linalg.inv(t3d.quaternions.quat2mat(l_start_unity_tcp[3:])) \
+                                @ t3d.quaternions.quat2mat(l_start_sim_tcp[3:])
+                l_target_tcp[3:]=t3d.quaternions.mat2quat(l_target_rot_mat).tolist()
+                if np.linalg.norm(l_target_tcp[:3]-l_cube_position)>0.05:
+                    print('left loss sync')
+                    l_tracking_state=False
+                else:
+                    list(target_links.values())[0].set_world_pose(position=l_target_tcp[:3],
+                          orientation=l_target_tcp[3:])
+        except:
             pass
         
+        r_cube_position, r_cube_orientation = target.get_world_pose()
+        l_cube_position, l_cube_orientation = list(target_links.values())[0].get_world_pose()
 
-        if past_pose is None:
-            past_pose = cube_position + 1.0
+        if r_past_pose is None:
+            r_past_pose = r_cube_position + 1.0
 
-        if np.linalg.norm(cube_position - past_pose) > 1e-3:
+        if l_past_pose is None:
+            l_past_pose = l_cube_position + 1.0
+
+        if (np.linalg.norm(r_cube_position - r_past_pose) > 1e-3 \
+            or np.linalg.norm(l_cube_position - l_past_pose) > 1e-3):
             # Set EE teleop goals, use cube for simple non-vr init:
-            ee_translation_goal = cube_position
-            ee_orientation_teleop_goal = cube_orientation
+            ee_translation_goal = r_cube_position
+            ee_orientation_teleop_goal = r_cube_orientation
             ik_goal = Pose(
                 position=tensor_args.to_device(ee_translation_goal),
                 quaternion=tensor_args.to_device(ee_orientation_teleop_goal),
             )
             link_poses = {}
             for i in target_links.keys():
-                print(i)
+                #print(i)
                 c_p, c_rot = target_links[i].get_world_pose()
                 link_poses[i] = Pose(
                     position=tensor_args.to_device(c_p),
@@ -462,7 +508,8 @@ def main():
                 goal_buffer.links_goal_pose[i].copy_(link_poses[i])
             goal_buffer.goal_pose.copy_(ik_goal)
             mpc.update_goal(goal_buffer)
-            past_pose = cube_position
+            r_past_pose = r_cube_position
+            l_past_pose = l_cube_position
 
         # if not changed don't call curobo:
 
@@ -502,14 +549,14 @@ def main():
             if x in cmd_state_full.joint_names:
                 idx_list.append(robot.get_dof_index(x))
                 common_js_names.append(x)
-        for n in finger_joint_name:
+        for n in finger_joint_name + l_finger_joint_name:
             idx_list.append(robot.get_dof_index(n))
 
         cmd_state = cmd_state_full.get_ordered_joint_state(common_js_names)
         cmd_state_full = cmd_state
         #print(cmd_state.position.cpu().numpy())
         art_action = ArticulationAction(
-            np.concatenate([cmd_state.position.cpu().numpy(),hand_q],axis=1),
+            np.concatenate([cmd_state.position.cpu().numpy(),r_hand_q,l_hand_q],axis=1),
             # cmd_state.velocity.cpu().numpy(),
             joint_indices=idx_list,
         )
