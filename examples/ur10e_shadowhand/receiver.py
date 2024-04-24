@@ -42,51 +42,51 @@ class Receiver(Thread):
             data, _ = self.socket_obj.recvfrom(4096)
             s=json.loads(data)
             print(s)
-            if self.controller.homing_state:
-                return True
+            # if self.controller.homing_state:
+            #     return True
 
-            if s["cmd"]==3:
-                self.controller.robot_go_home()
-                return True
+            # if s["cmd"]==3:
+            #     self.controller.robot_go_home()
+            #     return True
 
-            pos_from_unity = unity2zup_right_frame(np.array(s["pos"]+s["quat"]))
+            # pos_from_unity = unity2zup_right_frame(np.array(s["pos"]+s["quat"]))
 
 
-            if self.controller.homing_state:
-                print("still in homing state")
-                self.controller.tracking_state=False
-            else:
-                if s["cmd"]==2:
-                    if not uc.tracking_state:
-                        print("robot start tracking")
-                        uc.tracking_state=True
-                        uc.set_start_tcp(pos_from_unity)
+            # if self.controller.homing_state:
+            #     print("still in homing state")
+            #     self.controller.tracking_state=False
+            # else:
+            #     if s["cmd"]==2:
+            #         if not uc.tracking_state:
+            #             print("robot start tracking")
+            #             uc.tracking_state=True
+            #             uc.set_start_tcp(pos_from_unity)
                     
                     
-                if s["cmd"]==-2:
-                    if uc.tracking_state:
-                        print("robot stop tracking")
-                        uc.tracking_state=False
+            #     if s["cmd"]==-2:
+            #         if uc.tracking_state:
+            #             print("robot stop tracking")
+            #             uc.tracking_state=False
 
 
 
 
 
-            if not self.controller.homing_state:
-                target = self.controller.get_relative_target(pos_from_unity)
-                dis = np.linalg.norm(target[:3]-self.controller.get_current_tcp()[:3])
-                #print(dis)
-                if dis>0.1:
-                    if self.controller.tracking_state:
-                        print("robot lost sync")
-                    self.controller.tracking_state=False
-                if not self.controller.tracking_state:
-                    target =self.controller.get_current_tcp()
-                    #print(target)
-                else:
-                    self.controller.move_hand(s["q"])
+            # if not self.controller.homing_state:
+            #     target = self.controller.get_relative_target(pos_from_unity)
+            #     dis = np.linalg.norm(target[:3]-self.controller.get_current_tcp()[:3])
+            #     #print(dis)
+            #     if dis>0.1:
+            #         if self.controller.tracking_state:
+            #             print("robot lost sync")
+            #         self.controller.tracking_state=False
+            #     if not self.controller.tracking_state:
+            #         target =self.controller.get_current_tcp()
+            #         #print(target)
+            #     else:
+            #         self.controller.move_hand(s["q"])
 
-                self.controller.mpc_excute(target)
+            #     self.controller.mpc_excute(target)
             return True
         except:
             #print("error in udp")

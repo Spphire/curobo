@@ -36,8 +36,8 @@ class Ur10eController():
                  world_model:WorldConfig,
                  ros_ip="10.9.11.1",
                  ros_port="8000",
-                 config_name="ur10e.yml"): #"ur10e_shadowhand.yml"):
-        self.DOF=6
+                 config_name="ur10e_shadowhand.yml"): #"ur10e_shadowhand.yml"):
+        self.DOF=8
         self.ros_ip = ros_ip
         self.ros_port = ros_port
 
@@ -195,11 +195,11 @@ class Ur10eController():
 
     def move(self, target_q: List[float]):
         if self.can_move():
-            requests.post("http://"+self.ros_ip+":"+self.ros_port+"/move",json.dumps({'q': target_q}), timeout=0.05)
+            requests.post("http://"+self.ros_ip+":"+self.ros_port+"/move",json.dumps({'q': target_q}))#, timeout=0.05)
     
     def move_hand(self, target_q: List[float]):
         if self.can_move():
-            requests.post("http://"+self.ros_ip+":"+self.ros_port+"/move_hand",json.dumps({'q': target_q}), timeout=0.05)
+            requests.post("http://"+self.ros_ip+":"+self.ros_port+"/move_hand",json.dumps({'q': target_q}))#, timeout=0.05)
 
     def set_start_tcp(self, pos_quat:np.ndarray):
         self.start_real_tcp = self.get_current_tcp()
@@ -221,55 +221,32 @@ class Ur10eController():
         pass
 
     def mpc_excute(self, target:np.ndarray, can_move=True):
-        ik_suc = False
-        target = target.flatten()
-        target_position, target_orientation = target[:3],target[3:]
+        if target is not None:
+            target = target.flatten()
+            target_position, target_orientation = target[:3],target[3:]
 
-        if self.past_pose is None: self.past_pose = target_position + 1.0
-        if self.past_rot is None: self.past_rot = target_orientation +1.0
+            if self.past_pose is None: self.past_pose = target_position + 1.0
+            if self.past_rot is None: self.past_rot = target_orientation +1.0
 
+            ik_goal = Pose(
+                position=self.tensor_args.to_device(target_position.tolist()),
+                quaternion=self.tensor_args.to_device(target_orientation.tolist()),
+            )
 
-        ik_goal = Pose(
-            position=self.tensor_args.to_device(target_position.tolist()),
-            quaternion=self.tensor_args.to_device(target_orientation.tolist()),
-        )
-
-        if (
-            np.linalg.norm(target_position - self.past_pose) > 1e-2 
-            or np.linalg.norm(target_orientation - self.past_rot) > 1e-3
-        ):
-            
-            
-            
-            self.goal_buffer.goal_pose.copy_(ik_goal)
-            #print("-mpc...")
-            self.mpc.update_goal(self.goal_buffer)
-            
-            #print("mpc..")
-            self.past_pose = target_position
-            self.past_rot = target_orientation
-        
-        ik_result = self.ik_solver.solve_single(ik_goal)
-        if ik_result.success:
-            ik_suc = True
-            self.q6 = ik_result.js_solution.position.cpu().numpy().flatten()[5]
+            if (
+                np.linalg.norm(target_position - self.past_pose) > 1e-2 
+                or np.linalg.norm(target_orientation - self.past_rot) > 1e-3
+            ):
+                self.goal_buffer.goal_pose.copy_(ik_goal)
+                self.mpc.update_goal(self.goal_buffer)
+                self.past_pose = target_position
+                self.past_rot = target_orientation
 
         mpc_result = self.mpc.step(self.get_current_jointstate(), max_attempts=2)
         state = mpc_result.js_action.position.cpu().numpy()
-        #print(self.q6, state[:self.DOF].flatten().tolist()[-1])
         if can_move:  
             target_q = state.flatten().tolist()
-            # if ik_suc:
-            #     if target_q[-1]>self.q6+math.pi:
-            #         self.q6+=math.pi*2
-            #     elif target_q[-1]<self.q6-math.pi:
-            #         self.q6-=math.pi*2
-            #     self.q6=np.clip(self.q6,-2*math.pi,2*math.pi)
-            alpha = 5
-            #if abs(target_q[-1]-self.q6) > math.pi/9:
-            #target_q[-1] = (target_q[-1]*alpha + self.q6)/(alpha+1)
             self.move(target_q)
-        #else:
         
 
 class Shadowhand_Model():

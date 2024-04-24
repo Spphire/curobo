@@ -40,7 +40,7 @@ open another normal terminal:
 ```bash
 conda activate rfplanner #to activate rfplanner+curobo environment
 cd ~/workspace/syb/curobo
-python examples/ur10e_shadowhand/fastapi_receiver.py
+python examples/ur10e_shadowhand/fastapi_receiver_thread.py
 ```
 
 In Quest3, make sure wifi connected to 'ASUS_80_5G', and run unity app

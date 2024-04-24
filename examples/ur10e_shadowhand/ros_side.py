@@ -94,7 +94,7 @@ def move(joint: ArmJoints):
 @app.post("/move_hand")
 def move_hand(joint: ArmJoints):
     q=np.array(joint.q)/180*math.pi
-    hand_joints_goal = {i:j for (i, j) in zip(joint_names_hand, q)}
+    hand_joints_goal = {i:j for (i, j) in zip(joint_names_hand[2:], q[2:])}
     hand_commander.move_to_joint_value_target_unsafe(
         hand_joints_goal,
         0.01,  # time duration
