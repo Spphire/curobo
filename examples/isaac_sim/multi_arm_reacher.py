@@ -112,6 +112,7 @@ def main():
 
     robot_cfg = load_yaml(join_path(get_robot_configs_path(), args.robot))["robot_cfg"]
     print(robot_cfg["kinematics"]["urdf_path"])
+    print(RobotConfig.from_dict(robot_cfg,tensor_args))
     j_names = robot_cfg["kinematics"]["cspace"]["joint_names"]
     default_config = robot_cfg["kinematics"]["cspace"]["retract_config"]
 

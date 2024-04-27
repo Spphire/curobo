@@ -13,6 +13,8 @@ from curobo.wrap.reacher.ik_solver import IKSolver, IKSolverConfig
 import time
 import numpy as np
 
+from urdf_test import read_base_transform
+
 # 自定义双臂碰撞体环境
 def get_custom_world_model(table_height=0.02, 
                            y_offset=0.313+0.54, #双臂中心到南北向边界距离
@@ -69,12 +71,12 @@ class BiFlexivController():
         print("current q: ", self.left_robot.get_current_q()+self.right_robot.get_current_q())
 
         self.tensor_args = TensorDeviceType()
-        robot_cfg = load_yaml(join_path(get_robot_configs_path(), 'dual_flexiv.yml'))["robot_cfg"]
+        robot_cfg = read_base_transform(load_yaml(join_path(get_robot_configs_path(), 'dual_flexiv.yml'))["robot_cfg"])
         for link in robot_cfg["kinematics"]["link_names"]:
             if link is not robot_cfg["kinematics"]["ee_link"]:
                 self.other_end_name=link
                 break
-        bigger_robot_cfg = load_yaml(join_path(get_robot_configs_path(), 'dual_flexiv_bigger.yml'))["robot_cfg"]
+        bigger_robot_cfg = read_base_transform(load_yaml(join_path(get_robot_configs_path(), 'dual_flexiv_bigger.yml'))["robot_cfg"])
         self.robot_cfg = RobotConfig.from_dict(robot_cfg, self.tensor_args)
         self.bigger_robot_cfg = RobotConfig.from_dict(bigger_robot_cfg, self.tensor_args)
 
