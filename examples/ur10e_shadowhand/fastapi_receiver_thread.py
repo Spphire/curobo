@@ -13,6 +13,7 @@ from typing import List
 from curobo.geom.types import WorldConfig, Cuboid
 from rfplanner import Rfplanner
 import math
+# retargeting: 2.2458877563476562 ms;  mpc step: 9.508577346801758
 
 
 def get_custom_world_model(table_height=0.02):
@@ -134,7 +135,7 @@ def MainThread():
         if not uc.homing_state:
             target = uc.get_relative_target(pos_from_unity)
             dis = np.linalg.norm(target[:3]-uc.get_current_tcp()[:3])
-            if dis>0.1:
+            if dis>0.3:
                 if uc.tracking_state:
                     print("robot lost sync")
                 uc.tracking_state=False
@@ -144,7 +145,6 @@ def MainThread():
                 mes.rightHand.q[2:7] = rfplanner.get_thumb_q(mes.rightHand.__dict__,) # uc.hand_model.get_link_pose(np.array(mes.rightHand.q)/180*math.pi))
                 uc.move_hand(mes.rightHand.q)
             uc.mpc_excute(target)
-
         
 
 

@@ -176,35 +176,36 @@ class BiFlexivController():
         self.mpc_init()
         
     def mpc_excute(self, left_target:np.ndarray, right_target:np.ndarray):
-        target_position_l, target_orientation_l = left_target[:3],left_target[3:]
-        target_position_r, target_orientation_r = right_target[:3],right_target[3:]
-        if self.past_pose_l is None: self.past_pose_l = target_position_l + 1.0
-        if self.past_rot_l is None: self.past_rot_l = target_orientation_l +1.0
-        if self.past_pose_r is None: self.past_pose_r = target_position_r + 1.0
-        if self.past_rot_r is None: self.past_rot_r = target_orientation_r +1.0
+        if left_target is not None and right_target is not None:
+            target_position_l, target_orientation_l = left_target[:3],left_target[3:]
+            target_position_r, target_orientation_r = right_target[:3],right_target[3:]
+            if self.past_pose_l is None: self.past_pose_l = target_position_l + 1.0
+            if self.past_rot_l is None: self.past_rot_l = target_orientation_l +1.0
+            if self.past_pose_r is None: self.past_pose_r = target_position_r + 1.0
+            if self.past_rot_r is None: self.past_rot_r = target_orientation_r +1.0
 
-        if (
-            np.linalg.norm(target_position_l - self.past_pose_l) > 1e-2 
-            or np.linalg.norm(target_orientation_l - self.past_rot_l) > 1e-3
-            or np.linalg.norm(target_position_r - self.past_pose_r) > 1e-2 
-            or np.linalg.norm(target_orientation_r - self.past_rot_r) > 1e-3
-        ):
-            link_pose = Pose(
-                position=self.tensor_args.to_device(target_position_r),
-                quaternion=self.tensor_args.to_device(target_orientation_r),
-            )
-            self.goal_buffer.links_goal_pose[self.other_end_name].copy_(link_pose)
-            ik_goal = Pose(
-                position=self.tensor_args.to_device(target_position_l),
-                quaternion=self.tensor_args.to_device(target_orientation_l),
-            )
+            if (
+                np.linalg.norm(target_position_l - self.past_pose_l) > 1e-2 
+                or np.linalg.norm(target_orientation_l - self.past_rot_l) > 1e-3
+                or np.linalg.norm(target_position_r - self.past_pose_r) > 1e-2 
+                or np.linalg.norm(target_orientation_r - self.past_rot_r) > 1e-3
+            ):
+                link_pose = Pose(
+                    position=self.tensor_args.to_device(target_position_r),
+                    quaternion=self.tensor_args.to_device(target_orientation_r),
+                )
+                self.goal_buffer.links_goal_pose[self.other_end_name].copy_(link_pose)
+                ik_goal = Pose(
+                    position=self.tensor_args.to_device(target_position_l),
+                    quaternion=self.tensor_args.to_device(target_orientation_l),
+                )
 
-            self.goal_buffer.goal_pose.copy_(ik_goal)
-            self.mpc.update_goal(self.goal_buffer)
-            self.past_pose_l = target_position_l
-            self.past_rot_l = target_orientation_l
-            self.past_pose_r = target_position_r
-            self.past_rot_r = target_orientation_r
+                self.goal_buffer.goal_pose.copy_(ik_goal)
+                self.mpc.update_goal(self.goal_buffer)
+                self.past_pose_l = target_position_l
+                self.past_rot_l = target_orientation_l
+                self.past_pose_r = target_position_r
+                self.past_rot_r = target_orientation_r
 
         mpc_result = self.mpc.step(self.get_current_jointstate(), max_attempts=2)
         state = mpc_result.js_action.position.cpu().numpy().reshape(14)

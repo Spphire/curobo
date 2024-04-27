@@ -43,6 +43,9 @@ class Receiver(Thread):
     def receive(self):
         try:
             data, _ = self.socket_obj.recvfrom(4096)
+            if len(data)==0 and not (self.controller.right_robot.homing_state or self.controller.left_robot.homing_state):
+                self.controller.mpc_excute(None,None)
+                return
             s=json.loads(data)
 
             if self.controller.left_robot.homing_state or self.controller.right_robot.homing_state:

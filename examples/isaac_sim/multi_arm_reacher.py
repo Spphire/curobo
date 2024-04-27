@@ -34,7 +34,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--robot", type=str, default="dual_ur10e.yml", help="robot configuration to load"
+    "--robot", type=str, default="dual_flexiv.yml", help="robot configuration to load"
 )
 args = parser.parse_args()
 
@@ -111,7 +111,7 @@ def main():
     tensor_args = TensorDeviceType()
 
     robot_cfg = load_yaml(join_path(get_robot_configs_path(), args.robot))["robot_cfg"]
-
+    print(robot_cfg["kinematics"]["urdf_path"])
     j_names = robot_cfg["kinematics"]["cspace"]["joint_names"]
     default_config = robot_cfg["kinematics"]["cspace"]["retract_config"]
 
