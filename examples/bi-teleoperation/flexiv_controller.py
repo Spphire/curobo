@@ -1,6 +1,6 @@
 import os
 current_path = os.path.dirname(os.path.abspath(__file__))
-flexivrdk_root_path = os.path.join(current_path, "flexiv_rdk-main")
+flexivrdk_root_path = os.path.join(current_path, "flexiv_rdk")
 
 import sys
 sys.path.insert(0, flexivrdk_root_path+"/lib_py")

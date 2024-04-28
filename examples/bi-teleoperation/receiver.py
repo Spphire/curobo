@@ -25,7 +25,7 @@ def unity2zup_right_frame(pos_quat: np.ndarray):
 class Receiver(Thread):
     def __init__(self, 
                  controller:BiFlexivController, 
-                 local_ip= "192.168.2.223", # 机械臂那台机子ip
+                 local_ip= "192.168.2.187", # 机械臂那台机子ip
                  port=8082):
         self.address = (local_ip, port)
         self.socket_obj = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

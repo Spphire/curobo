@@ -9,7 +9,7 @@ without an express license agreement from NVIDIA CORPORATION or
 its affiliates is strictly prohibited.
 -->
 # bi-teleoperation
-[link](https://github.com/Spphire/curobo/tree/dev/examples/bi-teleoperation)
+[README](examples/bi-teleoperation/README.md)
 
 # shadowhand-teleoperation
 [link](https://github.com/Spphire/curobo/blob/dev/examples/ur10e_shadowhand)

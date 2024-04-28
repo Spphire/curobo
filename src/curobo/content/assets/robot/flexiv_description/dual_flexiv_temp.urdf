@@ -9,14 +9,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link0.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link0.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link0.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link0.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -29,14 +29,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link1.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link1.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link1.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link1.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -49,14 +49,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link2.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link2.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link2.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link2.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -69,14 +69,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link3.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link3.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link3.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link3.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -89,14 +89,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link4.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link4.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link4.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link4.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -109,14 +109,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link5.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link5.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link5.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link5.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -129,14 +129,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link6.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link6.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link6.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link6.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -149,14 +149,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link7.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link7.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link7.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link7.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -170,14 +170,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link0.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link0.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link0.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link0.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -190,14 +190,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link1.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link1.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link1.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link1.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -210,14 +210,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link2.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link2.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link2.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link2.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -230,14 +230,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link3.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link3.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link3.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link3.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -250,14 +250,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link4.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link4.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link4.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link4.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -270,14 +270,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link5.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link5.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link5.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link5.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -290,14 +290,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link6.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link6.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link6.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link6.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -310,14 +310,14 @@
     </inertial>
     <visual>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link7.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/visual/link7.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
       <material name="rizon_light_grey"/>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="/home/yibo/workspace/syb/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link7.stl"/>
+        <mesh filename="/home/xuehan/Projects/curobo/src/curobo/content/assets/robot/flexiv_description/meshes/collision/link7.stl"/>
       </geometry>
       <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
     </collision>
@@ -328,7 +328,7 @@
   <joint name="joint0" type="fixed">
     <parent link="world"/>
     <child link="base_link"/>
-    <origin xyz="0.0 666666.0 0.0" rpy="0.0 -0.0 0.0"/>
+    <origin xyz="0.0 0.313 0.0" rpy="0.0 -0.0 0.0"/>
     <axis xyz="1.0 0.0 0.0"/>
   </joint>
   <joint name="joint0_1" type="fixed">

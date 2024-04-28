@@ -49,8 +49,8 @@ def get_custom_world_model(table_height=0.02,
 
 
 class BiFlexivController():
-    def __init__(self, local_ip="192.168.2.223", 
-                 left_robot_ip="192.168.2.100", 
+    def __init__(self, local_ip="192.168.2.187",
+                 left_robot_ip="192.168.2.100",
                  right_robot_ip="192.168.2.101",
                  left_origin_offset=[0,0.313,0], # 实验室双臂间距为0.626m，南北向y轴
                  right_origin_offset=[0,-0.313,0]
