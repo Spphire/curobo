@@ -52,8 +52,8 @@ class Receiver(Thread):
                 return True
 
             # 夹爪部分
-            self.controller.left_robot.gripper.move(s["leftHand"]["squeeze"], 10, 20)
-            self.controller.right_robot.gripper.move(s["rightHand"]["squeeze"], 
+            self.controller.left_robot.gripper.move(0.1-s["leftHand"]["squeeze"]/9, 10, 20)
+            self.controller.right_robot.gripper.move(0.1-s["rightHand"]["squeeze"]/9, 
                                                      10, # API中显示似乎是速度但修改没有效果
                                                      20)
 
