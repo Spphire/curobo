@@ -125,8 +125,8 @@ class BiFlexivController():
     def mpc_init(self):
         self.mpc = MpcSolver(self.mpc_config)
         self.retract_cfg = self.mpc.rollout_fn.dynamics_model.retract_config.unsqueeze(0)
-        retract_state = JointState.from_position(self.retract_cfg, joint_names=self.mpc.rollout_fn.joint_names)
-        state = self.mpc.rollout_fn.compute_kinematics(retract_state)
+        self.retract_state = JointState.from_position(self.retract_cfg, joint_names=self.mpc.rollout_fn.joint_names)
+        state = self.mpc.rollout_fn.compute_kinematics(self.retract_state)
         retract_pose = Pose(state.ee_pos_seq, quaternion=state.ee_quat_seq)
         goal = Goal(
             current_state=self.get_current_jointstate(),
@@ -148,20 +148,16 @@ class BiFlexivController():
         self.right_robot.homing_state=True
 
         cu_js = self.get_current_jointstate()
-        result = self.motion_gen.plan_single(cu_js.unsqueeze(0),
-                                             goal_pose=self.left_robot.retract_pose,
-                                            #  Pose(
-                                            #      position=self.tensor_args.to_device([0.6,-0.1+0.313,0.4]),
-                                            #      quaternion=self.tensor_args.to_device([1,0,0,0]),
-                                            #  ),
-                                             link_poses={self.other_end_name:self.right_robot.retract_pose},
-                                             plan_config=MotionGenPlanConfig(
-                                                                                enable_graph=False, 
-                                                                                enable_graph_attempt=4, 
-                                                                                max_attempts=10, 
-                                                                                enable_finetune_trajopt=True
-                                                                            ))
-        
+        result = self.motion_gen.plan_single_js(
+            cu_js.unsqueeze(0),
+            goal_state=self.retract_state,
+            plan_config=MotionGenPlanConfig(
+                                            enable_graph=False, 
+                                            enable_graph_attempt=4, 
+                                            max_attempts=10, 
+                                            enable_finetune_trajopt=True
+                                        )
+        )
         if result.success:
             traj = result.get_interpolated_plan()
             cmd_plan = self.motion_gen.get_full_js(traj)
