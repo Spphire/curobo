@@ -57,7 +57,7 @@ robot_cfg:
     "link4":0,
     "link5":0,
     "link6":0,
-    "link7":0,
+    "link7": 0,
     "base_link_1": 0.05,
     "link1_1":0,
     "link2_1":0,
@@ -65,7 +65,7 @@ robot_cfg:
     "link4_1":0,
     "link5_1":0,
     "link6_1":0,
-    "link7_1":0,
+    "link7_1": 0,
     }
 
     use_global_cumul: True

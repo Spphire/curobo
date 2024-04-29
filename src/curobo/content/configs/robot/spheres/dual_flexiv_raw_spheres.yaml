@@ -83,7 +83,7 @@ collision_spheres:
       "radius": 0.015
       #
     - "center": [0.0, 0.049, 0.257]
-      "radius": 0.011
+      "radius": 0.021
     - "center": [0.0, 0.051, 0.246]
       "radius": 0.011
     - "center": [0.0, 0.051, 0.233]
@@ -106,7 +106,7 @@ collision_spheres:
       "radius": 0.015
       #
     - "center": [0.0, -0.049, 0.257]
-      "radius": 0.011
+      "radius": 0.021
     - "center": [0.0, -0.051, 0.246]
       "radius": 0.011
     - "center": [0.0, -0.051, 0.233]
@@ -211,7 +211,7 @@ collision_spheres:
       "radius": 0.015
       #
     - "center": [0.0, 0.049, 0.257]
-      "radius": 0.011
+      "radius": 0.021
     - "center": [0.0, 0.051, 0.246]
       "radius": 0.011
     - "center": [0.0, 0.051, 0.233]
@@ -234,7 +234,7 @@ collision_spheres:
       "radius": 0.015
       #
     - "center": [0.0, -0.049, 0.257]
-      "radius": 0.011
+      "radius": 0.021
     - "center": [0.0, -0.051, 0.246]
       "radius": 0.011
     - "center": [0.0, -0.051, 0.233]

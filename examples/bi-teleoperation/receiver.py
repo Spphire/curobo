@@ -52,10 +52,11 @@ class Receiver(Thread):
                 return True
 
             # 夹爪部分
-            self.controller.left_robot.gripper.move(s["leftHand"]["squeeze"], 10, 20)
-            self.controller.right_robot.gripper.move(s["rightHand"]["squeeze"], 
+            #print(s["leftHand"]["squeeze"])
+            self.controller.left_robot.gripper.move(0.1-s["leftHand"]["squeeze"]/10, 10, 10)
+            self.controller.right_robot.gripper.move(0.1-s["rightHand"]["squeeze"]/10, 
                                                      10, # API中显示似乎是速度但修改没有效果
-                                                     20)
+                                                     10)
 
             if s["leftHand"]["cmd"]==3 or s["rightHand"]["cmd"]==3:
                 self.controller.birobot_go_home()
