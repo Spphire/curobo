@@ -48,7 +48,9 @@ class UniController(Thread):
             self.controller.gripper.move(0.1-s["rightHand"]["squeeze"]/9, 100, 20)
 
             if s["rightHand"]["cmd"]==3:
+                self.controller.robot.setMode(FC.mode.NRT_JOINT_POSITION)
                 self.controller.robot_go_home()
+                self.controller.robot.setMode(FC.mode.NRT_CARTESIAN_MOTION_FORCE)
                 return True
 
             r_pos_from_unity = unity2zup_right_frame(np.array(s["rightHand"]["pos"]+s["rightHand"]["quat"]))

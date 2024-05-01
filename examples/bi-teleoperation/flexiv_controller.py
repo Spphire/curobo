@@ -56,7 +56,7 @@ class VirtualFlexivController():
 
 class FlexivController():
     def __init__(self,world_model:WorldConfig,
-                 local_ip="192.168.2.223",
+                 local_ip="192.168.2.187",
                  robot_ip="192.168.2.100",
                  origin_offset=[0,0.313,0] # 实验室双臂间距为0.626m，南北向y轴
                  ) -> None:
@@ -263,7 +263,7 @@ class FlexivController():
     def get_current_tcp_raw(self) -> List[float]:
         # 返回flexivAPI下机械臂当前tcp值
         self.robot.getRobotStates(self.robot_states)
-        return self.robot_states.tcpPos
+        return self.robot_states.tcpPose
     
     def get_current_jointstate(self):
         # 返回Curobo JointState类包装下的joints值
