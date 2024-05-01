@@ -44,6 +44,8 @@ class UniController(Thread):
             s=json.loads(data)
             if self.controller.homing_state:
                 return True
+            
+            self.controller.gripper.stop()
             self.controller.gripper.move(0.1-s["rightHand"]["squeeze"]/9, 1, 20)
 
             if s["rightHand"]["cmd"]==3:
