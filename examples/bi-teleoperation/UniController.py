@@ -24,7 +24,7 @@ def unity2zup_right_frame(pos_quat):
 
 class UniController(Thread):
     def __init__(self, controller:FlexivController, port=8082):
-        self.address = ("192.168.2.223", port)
+        self.address = ("192.168.2.187", port)
         self.socket_obj = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         #self.socket_obj.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket_obj.setblocking(0)
@@ -40,11 +40,11 @@ class UniController(Thread):
 
     def receive(self):
         try:
-            data, _ = self.socket_obj.recvfrom(1024)
+            data, _ = self.socket_obj.recvfrom(4096)
             s=json.loads(data)
             if self.controller.homing_state:
                 return True
-            self.controller.gripper.move(s["rightHand"]["squeeze"], 10, 20)
+            self.controller.gripper.move(0.1-s["rightHand"]["squeeze"]/9, 1, 20)
 
             if s["rightHand"]["cmd"]==3:
                 self.controller.robot_go_home()
@@ -68,14 +68,7 @@ class UniController(Thread):
 
             if not self.controller.homing_state:
                 right_target = self.controller.get_relative_target(r_pos_from_unity)
-                # if np.linalg.norm(right_target[:3]-self.controller.get_current_tcp()[:3])>0.5:
-                #     if self.controller.tracking_state:
-                #         print("robot lost sync")
-                #     self.controller.tracking_state=False
-                # if not self.controller.tracking_state:
-                #     right_target =self.controller.get_current_tcp()
-
-                self.controller.motion_gen_receive(right_target)
+                self.controller.tcp_move(right_target)
             return True
         except:
             #print("error in udp")
@@ -86,7 +79,7 @@ if __name__ == "__main__":
     FC = FlexivController(world_model=get_custom_world_model(),
                           robot_ip="192.168.2.101",
                           origin_offset=[0.0,0.0,0.0])
-    FC.init_motion_gen()
-    FC.robot_go_home()
+    FC.robot.setMode(FC.mode.NRT_CARTESIAN_MOTION_FORCE)
+
     r = UniController(controller=FC)
     r.run()

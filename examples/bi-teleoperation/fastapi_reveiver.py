@@ -68,9 +68,11 @@ def MainThread():
 
         if bi.right_robot.homing_state or bi.left_robot.homing_state:
             continue
-
-        bi.left_robot.gripper.move(0.1-mes.leftHand.squeeze/9, 10, 20)
-        bi.right_robot.gripper.move(0.1-mes.rightHand.squeeze/9, 10, 20) 
+        
+        bi.left_robot.gripper.stop()
+        bi.left_robot.gripper.move(0.1-mes.leftHand.squeeze/9, 1, 20)
+        bi.right_robot.gripper.stop()
+        bi.right_robot.gripper.move(0.1-mes.rightHand.squeeze/9, 1, 20) 
 
         if mes.rightHand.cmd==3 or mes.leftHand.cmd==3:
             bi.birobot_go_home()

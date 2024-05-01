@@ -305,6 +305,13 @@ class FlexivController():
                     [0.0]*self.DOF, 
                     v, 
                     a)
+            
+    def tcp_move(self, target_tcp):
+        self.robot.sendCartesianMotionForce(
+                target_tcp, 
+                [0.0]*6, 
+                0, 
+                0)
     
     def set_start_tcp(self, pos_quat:np.ndarray):
         # 记录unity下起始位置以及真实起始位置
