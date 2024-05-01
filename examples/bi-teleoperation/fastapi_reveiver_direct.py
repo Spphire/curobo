@@ -22,6 +22,8 @@ class HandMes(BaseModel):
     ringTip: List[float]
     pinkyTip: List[float]
 
+    squeeze: int
+
     cmd:int
 
 class UnityMes(BaseModel):
@@ -62,7 +64,6 @@ def MainThread():
             if not qq.empty():
                 mes: UnityMes = qq.get()
             elif not (bi.right_robot.homing_state or bi.left_robot.homing_state):
-                bi.mpc_excute(None,None)
                 continue
         except Exception as e:
             print(e)

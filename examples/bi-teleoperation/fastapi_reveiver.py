@@ -22,6 +22,8 @@ class HandMes(BaseModel):
     ringTip: List[float]
     pinkyTip: List[float]
 
+    squeeze: int
+
     cmd:int
 
 class UnityMes(BaseModel):
