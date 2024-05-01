@@ -260,6 +260,11 @@ class FlexivController():
         self.robot.getRobotStates(self.robot_states)
         return self.robot_states.q
     
+    def get_current_tcp_raw(self) -> List[float]:
+        # 返回flexivAPI下机械臂当前tcp值
+        self.robot.getRobotStates(self.robot_states)
+        return self.robot_states.tcpPos
+    
     def get_current_jointstate(self):
         # 返回Curobo JointState类包装下的joints值
         q = self.get_current_q()
@@ -316,6 +321,12 @@ class FlexivController():
     def set_start_tcp(self, pos_quat:np.ndarray):
         # 记录unity下起始位置以及真实起始位置
         self.start_real_tcp = self.get_current_tcp()
+        self.start_unity_tcp = pos_quat
+        self.tracking_state=True
+
+    def set_start_tcp_raw(self, pos_quat:np.ndarray):
+        # 记录unity下起始位置以及真实起始位置
+        self.start_real_tcp = self.get_current_tcp_raw()
         self.start_unity_tcp = pos_quat
         self.tracking_state=True
 

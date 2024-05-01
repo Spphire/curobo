@@ -45,8 +45,7 @@ class UniController(Thread):
             if self.controller.homing_state:
                 return True
             
-            self.controller.gripper.stop()
-            self.controller.gripper.move(0.1-s["rightHand"]["squeeze"]/9, 1, 20)
+            self.controller.gripper.move(0.1-s["rightHand"]["squeeze"]/9, 100, 20)
 
             if s["rightHand"]["cmd"]==3:
                 self.controller.robot_go_home()
@@ -64,11 +63,11 @@ class UniController(Thread):
                         self.controller.tracking_state=False
                     else:
                         print("robot start tracking")
-                        self.controller.set_start_tcp(r_pos_from_unity)
+                        self.controller.set_start_tcp_raw(r_pos_from_unity)
 
 
 
-            if not self.controller.homing_state:
+            if not self.controller.homing_state and self.controller.tracking_state:
                 right_target = self.controller.get_relative_target(r_pos_from_unity)
                 self.controller.tcp_move(right_target)
             return True
@@ -79,8 +78,10 @@ class UniController(Thread):
 if __name__ == "__main__":
 
     FC = FlexivController(world_model=get_custom_world_model(),
-                          robot_ip="192.168.2.101",
+                          robot_ip="192.168.2.100",
                           origin_offset=[0.0,0.0,0.0])
+    FC.init_motion_gen()
+    FC.robot_go_home()
     FC.robot.setMode(FC.mode.NRT_CARTESIAN_MOTION_FORCE)
 
     r = UniController(controller=FC)
