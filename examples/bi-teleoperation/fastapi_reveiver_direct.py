@@ -9,6 +9,11 @@ from typing import List
 from curobo.geom.types import WorldConfig, Cuboid
 from bi_flexiv_controller import BiFlexivController
 
+import json
+f = open("./base_transform.txt","r")
+base_transform:dict = json.loads(f.read())
+f.close()
+
 
 class HandMes(BaseModel):
     q: List[float]
@@ -31,7 +36,7 @@ class UnityMes(BaseModel):
     leftHand:HandMes
     rightHand:HandMes
 
-def unity2zup_right_frame(pos_quat):
+def unity2zup_right_frame(pos_quat, left: bool):
         pos_quat*=np.array([1,-1,1,1,-1,1,-1])
         rot_mat = t3d.quaternions.quat2mat(pos_quat[3:])
         pos_vec = pos_quat[:3]
@@ -40,6 +45,12 @@ def unity2zup_right_frame(pos_quat):
         T[:3,3]=pos_vec
         fit_mat = t3d.euler.axangle2mat([0,1,0],np.pi/2)
         fit_mat = fit_mat@t3d.euler.axangle2mat([0,0,1],-np.pi/2)
+
+        if left:
+            fit_mat = np.linalg.inv(np.array(list(base_transform.values())[0])[:3,:3]) @ fit_mat
+        else:
+            fit_mat = np.linalg.inv(np.array(list(base_transform.values())[1])[:3,:3]) @ fit_mat
+
         target_rot_mat=fit_mat@rot_mat
         target_pos_vec=fit_mat@pos_vec
         target = np.array(target_pos_vec.tolist()+t3d.quaternions.mat2quat(target_rot_mat).tolist())
@@ -83,8 +94,8 @@ def MainThread():
             bi.right_robot.robot.setMode(bi.right_robot.mode.NRT_CARTESIAN_MOTION_FORCE)
             continue
 
-        r_pos_from_unity = unity2zup_right_frame(np.array(mes.rightHand.pos+mes.rightHand.quat))
-        l_pos_from_unity = unity2zup_right_frame(np.array(mes.leftHand.pos+mes.leftHand.quat))
+        r_pos_from_unity = unity2zup_right_frame(np.array(mes.rightHand.pos+mes.rightHand.quat), False)
+        l_pos_from_unity = unity2zup_right_frame(np.array(mes.leftHand.pos+mes.leftHand.quat), True)
 
 
         if bi.left_robot.homing_state:
