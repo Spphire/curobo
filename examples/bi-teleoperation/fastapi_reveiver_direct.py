@@ -13,6 +13,11 @@ import json
 f = open("./base_transform.txt","r")
 base_transform:dict = json.loads(f.read())
 f.close()
+fit_mat = t3d.euler.axangle2mat([0,1,0],np.pi/2)
+fit_mat = fit_mat@t3d.euler.axangle2mat([0,0,1],-np.pi/2)
+fit_mat_list = []
+fit_mat_list.append( np.linalg.inv(np.array(list(base_transform.values())[0])[:3,:3]) @ fit_mat)
+fit_mat_list.append( np.linalg.inv(np.array(list(base_transform.values())[1])[:3,:3]) @ fit_mat)
 
 
 class HandMes(BaseModel):
@@ -43,13 +48,11 @@ def unity2zup_right_frame(pos_quat, left: bool):
         T=np.eye(4)
         T[:3,:3]= rot_mat
         T[:3,3]=pos_vec
-        fit_mat = t3d.euler.axangle2mat([0,1,0],np.pi/2)
-        fit_mat = fit_mat@t3d.euler.axangle2mat([0,0,1],-np.pi/2)
 
         if left:
-            fit_mat = np.linalg.inv(np.array(list(base_transform.values())[0])[:3,:3]) @ fit_mat
+            fit_mat = fit_mat_list[0]
         else:
-            fit_mat = np.linalg.inv(np.array(list(base_transform.values())[1])[:3,:3]) @ fit_mat
+            fit_mat = fit_mat_list[1]
 
         target_rot_mat=fit_mat@rot_mat
         target_pos_vec=fit_mat@pos_vec
