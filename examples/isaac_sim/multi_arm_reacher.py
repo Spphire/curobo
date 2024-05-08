@@ -84,6 +84,13 @@ from curobo.wrap.reacher.motion_gen import MotionGen, MotionGenConfig, MotionGen
 
 ############################################################
 
+import sys, os
+current_path = os.path.dirname(os.path.abspath(__file__))
+path =os.path.join(os.path.dirname(current_path),"bi-teleoperation")
+print("path========",path)
+sys.path.insert(0, path)
+from urdf_test import read_base_transform
+
 
 def main():
     # assuming obstacles are in objects_path:
@@ -110,7 +117,7 @@ def main():
 
     tensor_args = TensorDeviceType()
 
-    robot_cfg = load_yaml(join_path(get_robot_configs_path(), args.robot))["robot_cfg"]
+    robot_cfg = read_base_transform(load_yaml(join_path(get_robot_configs_path(), args.robot))["robot_cfg"])
     print(robot_cfg["kinematics"]["urdf_path"])
     print(RobotConfig.from_dict(robot_cfg,tensor_args))
     j_names = robot_cfg["kinematics"]["cspace"]["joint_names"]

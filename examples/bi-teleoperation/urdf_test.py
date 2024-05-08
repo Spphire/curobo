@@ -3,10 +3,7 @@ from curobo.util_file import get_assets_path, join_path, load_yaml, get_robot_co
 import json
 import numpy as np
 import jsbeautifier
-opts = jsbeautifier.default_options()
-opts.indent_size = 2
-
-robot_cfg = load_yaml(join_path(get_robot_configs_path(), "dual_flexiv.yml"))["robot_cfg"]
+import transforms3d as t3d
 
 def read_base_transform(robot_cfg, path="./base_transform.txt"):
     f = open(path,"r")
@@ -30,18 +27,33 @@ def read_base_transform(robot_cfg, path="./base_transform.txt"):
 
 
 def save_base_transform():
+    YR = t3d.euler.euler2mat(0,np.pi/4,0)
+
+    T = np.eye(4)
+    T[:3,:3] =t3d.euler.euler2mat(-np.pi/4,0,0) @ YR 
+    T[1,3]=0.114
+    T[2,3]=0.15
+
+    _T = np.eye(4)
+    _T[:3,:3] = t3d.euler.euler2mat(np.pi/4,0,0) @YR 
+    _T[1,3]=-0.114
+    _T[2,3]=0.15
+
     base_transform = {
-        "joint0":[[1.,0.,0.,0.],
-                [0.,1.,0.,0.313],
-                [0.,0.,1.,0.],
-                [0.,0.,0.,1.]],
-        "joint0_1":[[1.,0.,0.,0.],
-                [0.,1.,0.,-0.313],
-                [0.,0.,1.,0.],
-                [0.,0.,0.,1.]]
+        "joint0":T.tolist(),
+        "joint0_1":_T.tolist(),
     }
     with open("./base_transform.txt","w+") as f:
         f.write(jsbeautifier.beautify(json.dumps(base_transform),opts))
 
-save_base_transform()
-print(read_base_transform(robot_cfg)["kinematics"]["urdf_path"])
+
+if __name__ == "__main__":
+    opts = jsbeautifier.default_options()
+    opts.indent_size = 2
+
+    robot_cfg = load_yaml(join_path(get_robot_configs_path(), "dual_flexiv.yml"))["robot_cfg"]
+    save_base_transform()
+    print(read_base_transform(robot_cfg)["kinematics"]["urdf_path"])
+    print(np.array([-20,-20,35,38,10,10,-56])*np.pi/180)
+    print(np.array([40,-20,-35,38,-20,0,-100])*np.pi/180)
+    print((np.array([0,-10,0,90,0,40,0,0,-5,0,90,0,40,0])*np.pi/180).tolist())
