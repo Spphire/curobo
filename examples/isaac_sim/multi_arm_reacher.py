@@ -30,7 +30,7 @@ parser.add_argument(
     "--visualize_spheres",
     action="store_true",
     help="When True, visualizes robot spheres",
-    default=False,
+    default=True,
 )
 
 parser.add_argument(
