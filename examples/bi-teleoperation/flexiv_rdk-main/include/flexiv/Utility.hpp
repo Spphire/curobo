@@ -8,6 +8,7 @@
 
 #include <flexiv/Exception.hpp>
 #include <Eigen/Eigen>
+#include <array>
 #include <vector>
 
 namespace flexiv {
@@ -89,6 +90,34 @@ inline std::string vec2Str(
 }
 
 /**
+ * @brief Convert a std::array to a string.
+ * @param[in] arr std::array of any type and size.
+ * @param[in] decimal Decimal places to keep for each number in the array.
+ * @param[in] trailingSpace Whether to include a space after the last element.
+ * @return A string with format "arr[0] arr[1] ... arr[n] ", i.e. each element
+ * followed by a space, including the last one if trailingSpace = true.
+ */
+template <typename T, size_t N>
+inline std::string arr2Str(
+    const std::array<T, N>& arr, size_t decimal = 3, bool trailingSpace = true)
+{
+    auto padding = "";
+    std::stringstream ss;
+    ss.precision(decimal);
+    ss << std::fixed;
+
+    for (const auto& v : arr) {
+        ss << padding << v;
+        padding = " ";
+    }
+
+    if (trailingSpace) {
+        ss << " ";
+    }
+    return ss.str();
+}
+
+/**
  * @brief Check if any provided strings exist in the program arguments.
  * @param[in] argc Argument count passed to main() of the program.
  * @param[in] argv Argument vector passed to main() of the program, where
@@ -135,6 +164,10 @@ inline std::string parsePtStates(
     const std::vector<std::string>& ptStates, const std::string& parseTarget)
 {
     for (const auto& state : ptStates) {
+        // Skip if empty
+        if (state.empty()) {
+            continue;
+        }
         std::stringstream ss(state);
         std::string buffer;
         std::vector<std::string> parsedState;
